@@ -106,10 +106,11 @@ public void run(){
 
                 JSONRPC2Response resp = dispatcher.process(request, null);
 
-                System.out.println("hereeeee" + resp.toJSONString());
+                System.out.println(resp.toString());
                 printWriter.write("HTTP/1.1 200 OK\r\n");
                 printWriter.write("Content-Type: application/json\r\n");
                 printWriter.write("\r\n");
+                System.out.println("return string : " + resp.toJSONString());
                 printWriter.write(resp.toJSONString());
                 printWriter.flush();
                 printWriter.close();

@@ -1,5 +1,6 @@
 package edu.rit.CSCI652.impl;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.thetransactioncompany.jsonrpc2.JSONRPC2Request;
 import com.thetransactioncompany.jsonrpc2.JSONRPC2Response;
 import com.thetransactioncompany.jsonrpc2.client.JSONRPC2Session;
@@ -48,9 +49,9 @@ public class NewNode
             System.out.print("\n\n");
             System.out.println("***************************************************************************************");
             System.out.println("1 - Join the network");
-            System.out.println("2 - Upload a file");
-            System.out.println("3 - Search a file");
-            System.out.println("4 - Display finger table");
+            System.out.println("2 - Display finger table ");
+            System.out.println("3 - Upload a file");
+            System.out.println("4 - Search a file");
             System.out.println("5 - Leave the network");
             System.out.println("Enter an option : ");
 
@@ -86,16 +87,24 @@ public class NewNode
                     System.out.println("Joined the network");
                     break;
                 case 2 :
-                    System.out.println("Uploading a file");
-                    String filePath = "/Users/payalkothari/Documents/DS/Chord_Project/Chord_DHT/src/FileOne.txt";
-
+                    System.out.println("*******************  Finger Table  ******************** \n");
+                    System.out.print(" Start ");
+                    System.out.print("\t\t  Interval ");
+                    System.out.print("\t\t\t\t   Successor \n");
+                    for(int i =0; i< maxFingerTableSize; i++){
+                        FingerTableEntry entry = fingerTable.get(i);
+                        System.out.print("\n");
+                        System.out.print(" " + entry.getStart());
+                        System.out.print("\t\t\t     " + entry.getIntervalBegin() + "," + entry.getIntervalEnd());
+                        System.out.print("\t\t\t\t\t   " + entry.getSucc().getGUID());
+                    }
                     break;
             }
 
         }
     }
 
-    private static void initializeFingerTable() throws MalformedURLException, JSONRPC2SessionException {
+    private static void initializeFingerTable() throws IOException, JSONRPC2SessionException {
         ownNode.setFingerTable(fingerTable);
 
         for(int i = 0; i < maxFingerTableSize ; i++){
@@ -131,19 +140,19 @@ public class NewNode
             }
 
         }
-
+        System.out.println("fingr table");
         update_others();
     }
 
     private static void update_others() {
     }
 
-    private static Node find_successor(int id) throws MalformedURLException, JSONRPC2SessionException {
+    private static Node find_successor(int id) throws IOException, JSONRPC2SessionException {
         Node nRemote = find_predecessor(id);
         return nRemote.getFingerTable().get(1).getSucc();
     }
 
-    private static Node find_predecessor(int id) throws MalformedURLException, JSONRPC2SessionException {
+    private static Node find_predecessor(int id) throws IOException, JSONRPC2SessionException {
         Node nRemote = ownNode;
         int nRemoteGUID = nRemote.getGUID();
         Node nRemoteSucc = nRemote.getFingerTable().get(1).getSucc();
@@ -171,7 +180,17 @@ public class NewNode
 
             if (response.indicatesSuccess()){
 
-                nRemote = (Node) response.getResult();
+//                Item item = new ObjectMapper().readerFor(FingerTableEntry.class).readValue(response.getResult());
+//                new ObjectMapper().getDeserializationContext((Node)response.getResult());
+//                nRemote = (Node) response.getResult();
+                String json = (String) response.getResult();
+                ObjectMapper mapper = new ObjectMapper();
+                nRemote = mapper.readValue((String) response.getResult(), Node.class);
+
+                nRemoteGUID = nRemote.getGUID();
+                nRemoteSucc = nRemote.getFingerTable().get(1).getSucc();
+                nRemoteSuccGUID = nRemoteSucc.getGUID();
+                System.out.println("result : " + json);
             }
         }
         return nRemote;

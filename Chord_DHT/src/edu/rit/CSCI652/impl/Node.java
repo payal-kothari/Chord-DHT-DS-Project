@@ -1,5 +1,11 @@
 package edu.rit.CSCI652.impl;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
 import java.io.Serializable;
 import java.net.InetAddress;
 import java.util.List;
@@ -7,10 +13,18 @@ import java.util.List;
 /**
  * Created by payalkothari on 10/18/17.
  */
+
+
 public class Node implements Serializable{
-    private int GUID ;
+
     private String ip;
+    private int GUID ;
     private int port;
+
+//    @JsonDeserialize(using = CustomDeserializer.class)
+//    @JsonBackReference
+
+//    @JsonIgnoreProperties("succ")
     private List<FingerTableEntry> fingerTable;
 
     public List<FingerTableEntry> getFingerTable() {

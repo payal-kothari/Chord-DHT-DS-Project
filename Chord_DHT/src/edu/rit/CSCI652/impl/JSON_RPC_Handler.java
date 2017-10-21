@@ -1,5 +1,9 @@
 package edu.rit.CSCI652.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
+import com.sun.corba.se.impl.orbutil.ObjectWriter;
 import com.thetransactioncompany.jsonrpc2.JSONRPC2Error;
 import com.thetransactioncompany.jsonrpc2.JSONRPC2Request;
 import com.thetransactioncompany.jsonrpc2.JSONRPC2Response;
@@ -50,12 +54,18 @@ public class JSON_RPC_Handler {
                 } catch (JSONRPC2Error jsonrpc2Error) {
                     jsonrpc2Error.printStackTrace();
                 }
-                Node response =  get_closest_preceding_finger(id);
+                Node responseNode =  get_closest_preceding_finger(id);
 
-                JSONObject responseObj = new JSONObject();
-                responseObj.put("GUID", response.getGUID());
+                String resposeNodeStr = null;
+                try {
+                    resposeNodeStr = new ObjectMapper().writeValueAsString(responseNode);
+                } catch (JsonProcessingException e) {
+                    e.printStackTrace();
+                }
 
-                return new JSONRPC2Response(responseObj, jsonrpc2Request.getID());
+                System.out.println("check******** " + resposeNodeStr);
+
+                return new JSONRPC2Response(resposeNodeStr, jsonrpc2Request.getID());
             }
             return null;
         }
