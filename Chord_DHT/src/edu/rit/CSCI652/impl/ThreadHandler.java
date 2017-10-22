@@ -65,18 +65,31 @@ public class ThreadHandler extends Thread implements Serializable {
                         outObject.flush();
                         update_others(newNode);
                         System.out.println("");
+                        outObject.close();
+                        socket.close();
                         break;
 
                     case "Upload" :
-                        byte[] byteArr = new byte[10000];
+                        MessageDigest messageDigest = MessageDigest.getInstance("SHA-1");
+                        messageDigest.reset();
+                        byte[] byteArr = new byte[1020];
                         FileOutputStream fileOutputStream = new FileOutputStream("/Users/payalkothari/Documents/DS/Chord_Project/Chord_DHT/src/edu/rit/CSCI652/impl/z.txt");
                         BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(fileOutputStream);
                         InputStream inputStream = socket.getInputStream();
                         int bytesRead = 0;
-                        while((bytesRead=inputStream.read(byteArr))!=-1)
+                        while( (bytesRead=inputStream.read(byteArr))!=-1){
                             bufferedOutputStream.write(byteArr, 0, bytesRead);
+                            messageDigest.update(byteArr);
+                        }
                         bufferedOutputStream.flush();
-
+                        byte[] resultByteArray =  messageDigest.digest();
+                        BigInteger bigNum = new BigInteger(1, resultByteArray);
+                        int fileID = Math.abs(bigNum.intValue()) % centralServer.getMaxNodes();
+                        bufferedOutputStream.close();
+                        inputStream.close();
+                        fileOutputStream.close();
+                        socket.close();
+                        System.out.println("File id : " + fileID);
                         break;
 
                 }

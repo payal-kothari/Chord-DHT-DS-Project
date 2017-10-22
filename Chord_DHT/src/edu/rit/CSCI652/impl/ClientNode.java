@@ -140,17 +140,23 @@ public class ClientNode
                     int reconnectPort3 = objectInStream3.readInt();
                     System.out.println("received sec port");
                     Socket reconnectSocket3 = new Socket(centralServerIp, reconnectPort3);
-                    ObjectOutputStream outObject3 = new ObjectOutputStream(reconnectSocket3.getOutputStream());
+                    OutputStream outputStream = reconnectSocket3.getOutputStream();
+                    ObjectOutputStream outObject3 = new ObjectOutputStream(outputStream);
                     outObject3.writeUTF("Upload");
                     outObject3.flush();
+
                     File file = new File("/Users/payalkothari/Documents/DS/Chord_Project/Chord_DHT/src/edu/rit/CSCI652/impl/e.txt");
                     BufferedInputStream bufferedInputStream = new BufferedInputStream(new FileInputStream(file));
-                    OutputStream outputStream = reconnectSocket3.getOutputStream();
+
                     long fileLen = file.length();
                     byte [] byteArr  = new byte [(int)fileLen];
                     bufferedInputStream.read(byteArr,0,byteArr.length);
                     outputStream.write(byteArr,0,byteArr.length);
                     outputStream.flush();
+                    outputStream.close();
+                    bufferedInputStream.close();
+                    reconnectSocket3.close();
+
                     break;
 
             }
