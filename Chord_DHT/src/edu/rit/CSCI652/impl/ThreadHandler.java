@@ -141,6 +141,7 @@ public class ThreadHandler extends Thread implements Serializable {
         outputStream.close();
         bufferedInputStream.close();
         socketToUpload.close();
+        file.delete();
     }
 
     private void update_others(Node newNode) throws IOException {
