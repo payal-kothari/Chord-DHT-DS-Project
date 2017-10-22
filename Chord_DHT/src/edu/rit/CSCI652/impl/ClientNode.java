@@ -12,9 +12,8 @@ import java.util.*;
 /**
  * Created by payalkothari on 10/10/17.
  */
-public class FirstNode
+public class ClientNode
 {
-    private static URL serverURL = null;
     private static int PORT = 8000;
     private static String centralServerIp = "localhost";
     private static Node predecessor = null;
@@ -59,11 +58,11 @@ public class FirstNode
     }
 
     public static void setPredecessor(Node predecessor) {
-        FirstNode.predecessor = predecessor;
+        ClientNode.predecessor = predecessor;
     }
 
     public static void setSuccessor(Node successor) {
-        FirstNode.successor = successor;
+        ClientNode.successor = successor;
     }
 
 

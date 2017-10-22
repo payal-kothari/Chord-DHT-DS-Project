@@ -9,7 +9,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,7 +39,7 @@ public void run(){
             try {
                 while (true) {
                     System.out.println("waiting for connection");
-                    Socket socket = FirstNode.getServerSocket().accept();
+                    Socket socket = ClientNode.getServerSocket().accept();
                     System.out.println("Received RPC request");
                     new RPC_SubClass_two(socket, ownNode, fingerTable, maxFingerTableSize).start();
                 }

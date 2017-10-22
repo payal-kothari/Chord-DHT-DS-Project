@@ -1,13 +1,10 @@
 package edu.rit.CSCI652.impl;
 
-import org.omg.CORBA.Object;
-
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by payalkothari on 10/21/17.
@@ -19,16 +16,16 @@ public class incomingNotifHandler extends Thread{
     public void run(){
         try {
         while (true){
-                Socket socket = FirstNode.getServerSocket().accept();
+                Socket socket = ClientNode.getServerSocket().accept();
                 ObjectInputStream objectInStream = new ObjectInputStream(socket.getInputStream());
                 String in = objectInStream.readUTF();
                 switch (in){
                     case "New Node" :
-                        System.out.println("**************************  New node in the network, updating the values  **************************");
+                        System.out.println("******  New node has joined the network, updating the values......");
                         newNode = (Node) objectInStream.readObject();
 
-                        FirstNode.setSuccessor(find_successor(FirstNode.getOwnGUID(), FirstNode.getSuccessor()));
-                        FirstNode.setPredecessor(find_predecessor(FirstNode.getOwnGUID(), FirstNode.getPredecessor()));
+                        ClientNode.setSuccessor(find_successor(ClientNode.getOwnGUID(), ClientNode.getSuccessor()));
+                        ClientNode.setPredecessor(find_predecessor(ClientNode.getOwnGUID(), ClientNode.getPredecessor()));
 
                         update_fingerTable();
                 }
@@ -47,8 +44,8 @@ public class incomingNotifHandler extends Thread{
 
     private void update_fingerTable() {
 
-        List<FingerTableEntry> fingerTable =  FirstNode.getFingerTable();
-        int tableSize = FirstNode.getMaxFingerTableSize();
+        List<FingerTableEntry> fingerTable =  ClientNode.getFingerTable();
+        int tableSize = ClientNode.getMaxFingerTableSize();
 
         for (int i = 0; i < tableSize; i++){
             FingerTableEntry entry = fingerTable.get(i);
