@@ -87,20 +87,20 @@ public class ThreadHandler extends Thread implements Serializable {
                         bufferedOutputStream.flush();
                         byte[] resultByteArray =  messageDigest.digest();
                         BigInteger bigNum = new BigInteger(1, resultByteArray);
-                        int fileID = Math.abs(bigNum.intValue()) % centralServer.getMaxNodes();
+                        int fileHashID = Math.abs(bigNum.intValue()) % centralServer.getMaxNodes();
                         bufferedOutputStream.close();
                         objectInStream.close();
                         inputStream.close();
                         fileOutputStream.close();
                         socket.close();
-                        System.out.println("File id : " + fileID);
-                        Node contactNode = null;
-                        if(centralServer.getGUIDList().contains(fileID)){
-                            contactNode =  centralServer.getGlobalTable().get(fileID);
+                        System.out.println("File id : " + fileHashID);
+                        Node contactNode;
+                        if(centralServer.getGUIDList().contains(fileHashID)){
+                            contactNode =  centralServer.getGlobalTable().get(fileHashID);
                         }else {
-                            contactNode = findSuccessor(fileID);
+                            contactNode = findSuccessor(fileHashID);
                         }
-                        sendFile(contactNode, fileName);
+                        sendFile(contactNode, fileHashID, fileName);
                         centralServer.setFileNum(++fileNum);
                         break;
 
@@ -121,11 +121,12 @@ public class ThreadHandler extends Thread implements Serializable {
         }
     }
 
-    private void sendFile(Node contactNode, String fileName) throws IOException {
+    private void sendFile(Node contactNode, int fileHashID, String fileName) throws IOException {
         Socket socketToUpload = new Socket(contactNode.getIp(), contactNode.getPort());
         OutputStream outputStream = socketToUpload.getOutputStream();
         ObjectOutputStream outObject = new ObjectOutputStream(outputStream);
         outObject.writeUTF("Store File");
+        outObject.writeInt(fileHashID);
         outObject.writeUTF(fileName);
         outObject.flush();
         System.out.println("Sending file to node : " + contactNode.getGUID());
@@ -162,8 +163,6 @@ public class ThreadHandler extends Thread implements Serializable {
                 }
             }
         }
-
-
     }
 
     private Node findSuccessor(int GUID) {

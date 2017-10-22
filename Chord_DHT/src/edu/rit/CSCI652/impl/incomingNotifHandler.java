@@ -3,8 +3,7 @@ package edu.rit.CSCI652.impl;
 import java.io.*;
 import java.math.BigInteger;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by payalkothari on 10/21/17.
@@ -28,10 +27,21 @@ public class incomingNotifHandler extends Thread{
                         ClientNode.setPredecessor(find_predecessor(ClientNode.getOwnGUID(), ClientNode.getPredecessor()));
 
                         update_fingerTable();
+                        check_files();
 
                     case "Store File" :
                         System.out.println("Receiving a file from server");
+                        int fileHashId = objectInStream.readInt();
                         String fileName = objectInStream.readUTF();
+                        List filesList =  ClientNode.getFileHashIDAndNameMap().get(fileHashId);
+                        if(filesList != null){
+                            filesList.add(fileName);
+                        }else {
+                            List<String> fileList = new ArrayList<>();
+                            fileList.add(fileName);
+                            ClientNode.getFileHashIDAndNameMap().put(fileHashId, fileList);
+                        }
+                        Map map= ClientNode.getFileHashIDAndNameMap();
                         byte[] byteArr = new byte[1020];
                         FileOutputStream fileOutputStream = new FileOutputStream("/Users/payalkothari/Documents/DS/Chord_Project/Chord_DHT/src/edu/rit/CSCI652/impl/Client "  + ClientNode.getOwnGUID() + "FileStorage/" + fileName);
                         BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(fileOutputStream);
@@ -59,6 +69,52 @@ public class incomingNotifHandler extends Thread{
         }
 
 
+    }
+
+    private void check_files() throws IOException {
+
+        Map map = ClientNode.getFileHashIDAndNameMap();
+        Collection keys = map.keySet();
+        Iterator iter = keys.iterator();
+        while (iter.hasNext()){
+            int fileHashId = (int) iter.next();
+            if(fileHashId != ClientNode.getOwnGUID()){
+               Node succNode = find_successor(fileHashId, ClientNode.getOwnNode());
+               if(succNode != ClientNode.getOwnNode()){
+                   List files = (List) map.get(fileHashId);
+                   Iterator it = files.iterator();
+                   while (it.hasNext()){
+                       String fileName = (String) it.next();
+                       send_files(succNode, fileHashId, fileName);
+                   }
+               }
+            }
+        }
+
+    }
+
+    private void send_files(Node contactNode, int fileHashID, String fileName) throws IOException {
+        Socket socketToUpload = new Socket(contactNode.getIp(), contactNode.getPort());
+        OutputStream outputStream = socketToUpload.getOutputStream();
+        ObjectOutputStream outObject = new ObjectOutputStream(outputStream);
+        outObject.writeUTF("Store File");
+        outObject.writeInt(fileHashID);
+        outObject.writeUTF(fileName);
+        outObject.flush();
+        System.out.println("Sending file to node : " + contactNode.getGUID());
+
+        File file = new File("/Users/payalkothari/Documents/DS/Chord_Project/Chord_DHT/src/edu/rit/CSCI652/impl/Client " + ClientNode.getOwnGUID() + "FileStorage/" + fileName);
+        BufferedInputStream bufferedInputStream = new BufferedInputStream(new FileInputStream(file));
+
+        long fileLen = file.length();
+        byte [] byteArr  = new byte [(int)fileLen];
+        bufferedInputStream.read(byteArr,0,byteArr.length);
+        outputStream.write(byteArr,0,byteArr.length);
+        outputStream.flush();
+        outputStream.close();
+        bufferedInputStream.close();
+        socketToUpload.close();
+        file.delete();
     }
 
     private void update_fingerTable() {

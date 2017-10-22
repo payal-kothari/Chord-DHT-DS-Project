@@ -15,6 +15,11 @@ public class ClientNode
     private static Node predecessor = null;
     private static Node successor = null;
     private static int ownGUID = 0;
+    private static HashMap<Integer, List<String>> fileHashIDAndNameMap = new HashMap<>();
+
+    public static HashMap<Integer, List<String>> getFileHashIDAndNameMap() {
+        return fileHashIDAndNameMap;
+    }
 
     public static int getMaxFingerTableSize() {
         return maxFingerTableSize;
@@ -81,8 +86,9 @@ public class ClientNode
             System.out.println("1 - Join the network");
             System.out.println("2 - Display finger table, predecessor, successor ");
             System.out.println("3 - Upload a file");
-            System.out.println("4 - Search a file");
-            System.out.println("5 - Leave the network");
+            System.out.println("4 - Show list of the files stored on this machine");
+            System.out.println("5 - Search a file");
+            System.out.println("6 - Leave the network");
             System.out.println("Enter an option : ");
 
 
@@ -163,6 +169,25 @@ public class ClientNode
                     reconnectSocket3.close();
                     break;
 
+                case 4 :
+                    Set<Map.Entry<Integer, List<String>>> entrySet = fileHashIDAndNameMap.entrySet();
+                    Iterator<Map.Entry<Integer, List<String>>> entrySetIter = entrySet.iterator();
+                    System.out.println("*********  List of the files ********* \n");
+                    System.out.print(" File ID ");
+                    System.out.print("\t\t File Name");
+                    while (entrySetIter.hasNext()){
+                        System.out.print("\n");
+                        Map.Entry entry = entrySetIter.next();
+                        System.out.print("   " + entry.getKey());
+                        List<String> files = (List<String>) entry.getValue();
+                        Iterator iter = files.iterator();
+                        System.out.print("\t\t\t  ");
+                        while (iter.hasNext()){
+                            String name = (String) iter.next();
+                            System.out.print(name + ", ");
+                        }
+                    }
+                    break;
             }
 
         }
