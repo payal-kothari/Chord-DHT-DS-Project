@@ -10,7 +10,7 @@ import java.util.*;
  */
 public class ClientNode
 {
-    private static int PORT = 8000;
+    private static int ServerSocketPort = 8000;
     private static String centralServerIp = "localhost";
     private static Node predecessor = null;
     private static Node successor = null;
@@ -64,7 +64,7 @@ public class ClientNode
 
 
     public static void main(String[] args) throws IOException, ClassNotFoundException {
-        serverSocket = new ServerSocket(PORT);
+        serverSocket = new ServerSocket(ServerSocketPort);
         System.out.println("starting thread");
         new incomingNotifHandler().start();
 
@@ -106,8 +106,12 @@ public class ClientNode
                     maxNodesInTheNetwork = (int) Math.pow(2, maxFingerTableSize);
                     ownGUID = inputStream.readInt();
                     ownNode.setGUID(ownGUID);
+                    File dir = new File("/Users/payalkothari/Documents/DS/Chord_Project/Chord_DHT/src/edu/rit/CSCI652/impl/Client " + ownGUID + "FileStorage");
+                    if(!dir.exists()){
+                        dir.mkdirs();
+                    }
                     ownNode.setIp(reconnectSocket.getLocalAddress());
-                    ownNode.setPort(8080);
+                    ownNode.setPort(ServerSocketPort);
                     predecessor = (Node) inputStream.readObject();
                     successor = (Node) inputStream.readObject();
                     ArrayList<Node> fingerTableSuccessors = new ArrayList<>();
@@ -143,20 +147,20 @@ public class ClientNode
                     OutputStream outputStream = reconnectSocket3.getOutputStream();
                     ObjectOutputStream outObject3 = new ObjectOutputStream(outputStream);
                     outObject3.writeUTF("Upload");
+                    String fileName = scanner.nextLine();
+                    outObject3.writeUTF(fileName);
                     outObject3.flush();
-
-                    File file = new File("/Users/payalkothari/Documents/DS/Chord_Project/Chord_DHT/src/edu/rit/CSCI652/impl/e.txt");
+                    File file = new File("/Users/payalkothari/Documents/DS/Chord_Project/Chord_DHT/src/edu/rit/CSCI652/impl/" + fileName);
                     BufferedInputStream bufferedInputStream = new BufferedInputStream(new FileInputStream(file));
-
                     long fileLen = file.length();
                     byte [] byteArr  = new byte [(int)fileLen];
                     bufferedInputStream.read(byteArr,0,byteArr.length);
                     outputStream.write(byteArr,0,byteArr.length);
                     outputStream.flush();
                     outputStream.close();
+                    outObject3.close();
                     bufferedInputStream.close();
                     reconnectSocket3.close();
-
                     break;
 
             }

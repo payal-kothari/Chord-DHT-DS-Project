@@ -1,7 +1,7 @@
 package edu.rit.CSCI652.impl;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
+import java.io.*;
+import java.math.BigInteger;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +28,25 @@ public class incomingNotifHandler extends Thread{
                         ClientNode.setPredecessor(find_predecessor(ClientNode.getOwnGUID(), ClientNode.getPredecessor()));
 
                         update_fingerTable();
+
+                    case "Store File" :
+                        System.out.println("Receiving a file from server");
+                        String fileName = objectInStream.readUTF();
+                        byte[] byteArr = new byte[1020];
+                        FileOutputStream fileOutputStream = new FileOutputStream("/Users/payalkothari/Documents/DS/Chord_Project/Chord_DHT/src/edu/rit/CSCI652/impl/Client "  + ClientNode.getOwnGUID() + "FileStorage/" + fileName);
+                        BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(fileOutputStream);
+                        InputStream inputStream = socket.getInputStream();
+                        int bytesRead = 0;
+                        while( (bytesRead=inputStream.read(byteArr))!=-1){
+                            bufferedOutputStream.write(byteArr, 0, bytesRead);
+                        }
+                        bufferedOutputStream.flush();
+                        bufferedOutputStream.close();
+                        inputStream.close();
+                        fileOutputStream.close();
+                        socket.close();
+
+                        break;
                 }
 
 

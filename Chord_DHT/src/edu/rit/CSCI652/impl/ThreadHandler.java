@@ -24,16 +24,18 @@ public class ThreadHandler extends Thread implements Serializable {
     private static int currentPort;
     private static CentralServer threadSyncObject;
     private static String cmd;
+    private static ObjectInputStream objectInStream;
 
 
-
-    public ThreadHandler(Socket socket, int port,CentralServer threadSyncObject,String command) {
+    public ThreadHandler(Socket socket, int port,CentralServer threadSyncObject,String command, ObjectInputStream objectInStream) {
         this.centralServer = new CentralServer();
         this.socket = socket;
         this.currentPort = port;
         this.threadSyncObject = threadSyncObject;
         this.cmd = command;
+        this.objectInStream = objectInStream;
     }
+
 
     public void run() {
         synchronized (threadSyncObject) {
@@ -57,7 +59,6 @@ public class ThreadHandler extends Thread implements Serializable {
                         outObject.writeInt(GUID);
                         outObject.writeObject(predecessor);
                         outObject.writeObject(successor);
-
                         for(int i = 0; i < centralServer.getMaxFingerTableSize() ; i++){
                             int nextStart = (int) ((GUID + Math.pow(2, i)) % centralServer.getMaxNodes());
                             outObject.writeObject(findSuccessor(nextStart));
@@ -70,10 +71,12 @@ public class ThreadHandler extends Thread implements Serializable {
                         break;
 
                     case "Upload" :
+                        String fileName = objectInStream.readUTF();
                         MessageDigest messageDigest = MessageDigest.getInstance("SHA-1");
                         messageDigest.reset();
                         byte[] byteArr = new byte[1020];
-                        FileOutputStream fileOutputStream = new FileOutputStream("/Users/payalkothari/Documents/DS/Chord_Project/Chord_DHT/src/edu/rit/CSCI652/impl/z.txt");
+                        int fileNum = centralServer.getFileNum();
+                        FileOutputStream fileOutputStream = new FileOutputStream("/Users/payalkothari/Documents/DS/Chord_Project/Chord_DHT/src/edu/rit/CSCI652/impl/ServerFileStorage/" + fileName);
                         BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(fileOutputStream);
                         InputStream inputStream = socket.getInputStream();
                         int bytesRead = 0;
@@ -86,10 +89,19 @@ public class ThreadHandler extends Thread implements Serializable {
                         BigInteger bigNum = new BigInteger(1, resultByteArray);
                         int fileID = Math.abs(bigNum.intValue()) % centralServer.getMaxNodes();
                         bufferedOutputStream.close();
+                        objectInStream.close();
                         inputStream.close();
                         fileOutputStream.close();
                         socket.close();
                         System.out.println("File id : " + fileID);
+                        Node contactNode = null;
+                        if(centralServer.getGUIDList().contains(fileID)){
+                            contactNode =  centralServer.getGlobalTable().get(fileID);
+                        }else {
+                            contactNode = findSuccessor(fileID);
+                        }
+                        sendFile(contactNode, fileName);
+                        centralServer.setFileNum(++fileNum);
                         break;
 
                 }
@@ -109,6 +121,28 @@ public class ThreadHandler extends Thread implements Serializable {
         }
     }
 
+    private void sendFile(Node contactNode, String fileName) throws IOException {
+        Socket socketToUpload = new Socket(contactNode.getIp(), contactNode.getPort());
+        OutputStream outputStream = socketToUpload.getOutputStream();
+        ObjectOutputStream outObject = new ObjectOutputStream(outputStream);
+        outObject.writeUTF("Store File");
+        outObject.writeUTF(fileName);
+        outObject.flush();
+        System.out.println("Sending file to node : " + contactNode.getGUID());
+
+        File file = new File("/Users/payalkothari/Documents/DS/Chord_Project/Chord_DHT/src/edu/rit/CSCI652/impl/ServerFileStorage/" + fileName);
+        BufferedInputStream bufferedInputStream = new BufferedInputStream(new FileInputStream(file));
+
+        long fileLen = file.length();
+        byte [] byteArr  = new byte [(int)fileLen];
+        bufferedInputStream.read(byteArr,0,byteArr.length);
+        outputStream.write(byteArr,0,byteArr.length);
+        outputStream.flush();
+        outputStream.close();
+        bufferedInputStream.close();
+        socketToUpload.close();
+    }
+
     private void update_others(Node newNode) throws IOException {
         ConcurrentHashMap globalTable = centralServer.getGlobalTable();
         ObjectOutputStream outObject;
@@ -118,7 +152,7 @@ public class ThreadHandler extends Thread implements Serializable {
         while (iter.hasNext()){
             Node node = (Node) iter.next();
             if(newNode != node){
-                Socket socket = new Socket(node.getIp(), 8000);
+                Socket socket = new Socket(node.getIp(), node.getPort());
                 if(socket.isConnected()) {
                     outObject = new ObjectOutputStream(socket.getOutputStream());
                     outObject.writeUTF("New Node");

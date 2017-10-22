@@ -1,5 +1,6 @@
 package edu.rit.CSCI652.impl;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -14,6 +15,15 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class CentralServer {
 
+    public static int getFileNum() {
+        return fileNum;
+    }
+
+    public static void setFileNum(int fileNum) {
+        CentralServer.fileNum = fileNum;
+    }
+
+    private static int fileNum = 1;
     private static int maxNodes = 0;                    // N
     private static int maxFingerTableSize = 0;          // m
     private static ServerSocket centralServerSocket = null;
@@ -41,6 +51,8 @@ public class CentralServer {
 
     public static void main(String[] args) throws IOException, ClassNotFoundException {
         CentralServer threadSyncObject = new CentralServer();
+        File dir = new File("/Users/payalkothari/Documents/DS/Chord_Project/Chord_DHT/src/edu/rit/CSCI652/impl/ServerFileStorage");
+        dir.mkdirs();
 
 //        maxNodes = Integer.parseInt(args[0]);
         maxNodes = 16;
@@ -66,7 +78,7 @@ public class CentralServer {
             Socket subSocket = subServerSocket.accept();
             ObjectInputStream objectInStream = new ObjectInputStream(subSocket.getInputStream());
             String command = objectInStream.readUTF();
-            new ThreadHandler(subSocket, nextFreePort, threadSyncObject, command).start();  // new thread for new connection
+            new ThreadHandler(subSocket, nextFreePort, threadSyncObject, command, objectInStream).start();  // new thread for new connection
             System.out.println();
         }
     }
