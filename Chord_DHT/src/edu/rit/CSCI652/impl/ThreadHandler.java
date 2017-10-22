@@ -67,7 +67,17 @@ public class ThreadHandler extends Thread implements Serializable {
                         System.out.println("");
                         break;
 
+                    case "Upload" :
+                        byte[] byteArr = new byte[10000];
+                        FileOutputStream fileOutputStream = new FileOutputStream("/Users/payalkothari/Documents/DS/Chord_Project/Chord_DHT/src/edu/rit/CSCI652/impl/z.txt");
+                        BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(fileOutputStream);
+                        InputStream inputStream = socket.getInputStream();
+                        int bytesRead = 0;
+                        while((bytesRead=inputStream.read(byteArr))!=-1)
+                            bufferedOutputStream.write(byteArr, 0, bytesRead);
+                        bufferedOutputStream.flush();
 
+                        break;
 
                 }
             } catch (NoSuchAlgorithmException e) {
@@ -130,7 +140,6 @@ public class ThreadHandler extends Thread implements Serializable {
     }
 
     private Node findPredecessor(int GUID) {
-
         List<Integer> GUIDList = centralServer.getGUIDList();
         Collections.sort(GUIDList, Collections.reverseOrder());
 

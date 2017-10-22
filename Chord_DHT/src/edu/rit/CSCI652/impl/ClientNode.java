@@ -1,11 +1,7 @@
 package edu.rit.CSCI652.impl;
 
 
-//import com.thetransactioncompany.jsonrpc2.client.JSONRPC2SessionException;
-
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.net.*;
 import java.util.*;
 
@@ -136,6 +132,27 @@ public class ClientNode
                         System.out.print("\t\t\t\t\t   " + entry.getSucc().getGUID());
                     }
                     break;
+
+                case 3 :
+                    System.out.println("Uploading a file");
+                    Socket socketToUpload = new Socket(centralServerIp, 2000);
+                    ObjectInputStream objectInStream3 = new ObjectInputStream(socketToUpload.getInputStream());
+                    int reconnectPort3 = objectInStream3.readInt();
+                    System.out.println("received sec port");
+                    Socket reconnectSocket3 = new Socket(centralServerIp, reconnectPort3);
+                    ObjectOutputStream outObject3 = new ObjectOutputStream(reconnectSocket3.getOutputStream());
+                    outObject3.writeUTF("Upload");
+                    outObject3.flush();
+                    File file = new File("/Users/payalkothari/Documents/DS/Chord_Project/Chord_DHT/src/edu/rit/CSCI652/impl/e.txt");
+                    BufferedInputStream bufferedInputStream = new BufferedInputStream(new FileInputStream(file));
+                    OutputStream outputStream = reconnectSocket3.getOutputStream();
+                    long fileLen = file.length();
+                    byte [] byteArr  = new byte [(int)fileLen];
+                    bufferedInputStream.read(byteArr,0,byteArr.length);
+                    outputStream.write(byteArr,0,byteArr.length);
+                    outputStream.flush();
+                    break;
+
             }
 
         }
@@ -164,54 +181,5 @@ public class ClientNode
                 FingerTableEntry entry = fingerTable.get(i);
                 entry.setSucc(successorsList.get(i));
         }
-        update_others();
     }
-
-    private static void update_others() {
-
-
-
-
-
-    }
-
-
-
-//    private static Node find_successor(int id) throws MalformedURLException, JSONRPC2SessionException {
-//        Node nRemote = find_predecessor(id);
-//        return nRemote.getFingerTable().get(1).getSucc();
-//    }
-
-//    private static Node find_predecessor(int id) throws MalformedURLException, JSONRPC2SessionException {
-//        Node nRemote = ownNode;
-//        int nRemoteGUID = nRemote.getGUID();
-//        Node nRemoteSucc = nRemote.getFingerTable().get(1).getSucc();
-//        int nRemoteSuccGUID = nRemoteSucc.getGUID();
-//
-//        while (!(nRemoteGUID < nRemoteSuccGUID && id > nRemoteGUID && id < nRemoteSuccGUID)
-//                || !(nRemoteGUID > nRemoteSuccGUID && id > nRemoteGUID && id > 0)
-//                || !(nRemoteGUID > nRemoteSuccGUID && id >= 0 && id < nRemoteSuccGUID) ){
-//
-//            System.out.println("remote ip : " + nRemote.getIp());
-//            String urlString = "http:/" + nRemote.getIp() + ":8080";
-//            serverURL = new URL("http://127.0.0.1:8080");
-//
-//            JSONRPC2Session mySession = new JSONRPC2Session(serverURL);
-//
-//            String method = "get_closest_preceding_finger";
-//            int requestID = ownNode.getGUID();
-//            HashMap param = new HashMap<>();
-//            param.put("id", id);
-//
-//            JSONRPC2Request request = new JSONRPC2Request(method, param, requestID);
-//            JSONRPC2Response response = null;
-//
-//            response = mySession.send(request);
-//
-//            if (response.indicatesSuccess()){
-//                nRemote = (Node) response.getResult();
-//            }
-//        }
-//        return nRemote;
-//    }
 }
