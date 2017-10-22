@@ -75,15 +75,16 @@ public class NewNode
                     maxFingerTableSize = inputStream.readInt();
                     maxNodesInTheNetwork = (int) Math.pow(2, maxFingerTableSize);
                     ownGUID = inputStream.readInt();
-                    predecessor = new Node();
-                    predecessor.setGUID(inputStream.readInt());
-                    predecessor.setIp(inputStream.readUTF());
-                    predecessor.setPort(inputStream.readInt());
                     ownNode.setGUID(ownGUID);
-                    ownNode.setIp(reconnectSocket.getLocalAddress().toString());
+                    ownNode.setIp(reconnectSocket.getLocalAddress());
                     ownNode.setPort(8080);
-                    successor = ownNode;
-                    initializeFingerTable();
+                    predecessor = (Node) inputStream.readObject();
+                    successor = (Node) inputStream.readObject();
+                    ArrayList<Node> fingerTableSuccessors = new ArrayList<>();
+                    for(int i = 0; i < maxFingerTableSize ; i++){
+                        fingerTableSuccessors.add((Node) inputStream.readObject());
+                    }
+//                    initializeFingerTable(fingerTableSuccessors);
                     System.out.println("Joined the network");
                     break;
                 case 2 :
@@ -104,45 +105,45 @@ public class NewNode
         }
     }
 
-    private static void initializeFingerTable() throws IOException, JSONRPC2SessionException {
-        ownNode.setFingerTable(fingerTable);
-
-        for(int i = 0; i < maxFingerTableSize ; i++){
-            FingerTableEntry entry = new FingerTableEntry();
-            entry.setStart((int) ((ownGUID + Math.pow(2, i)) % maxNodesInTheNetwork));  // k + 2^i
-            fingerTable.add(entry);
-        }
-
-        for(int i = 0; i < maxFingerTableSize-1 ; i++){
-            FingerTableEntry entry = fingerTable.get(i);
-            entry.setIntervalBegin(entry.getStart());
-            FingerTableEntry nextEntry = fingerTable.get(i+1);
-            entry.setIntervalEnd(nextEntry.getStart());
-        }
-        FingerTableEntry lastEntry = fingerTable.get(maxFingerTableSize-1);
-        lastEntry.setIntervalBegin(lastEntry.getStart());
-        lastEntry.setIntervalEnd(fingerTable.get(0).getStart());
-
-        if(ownGUID == predecessor.getGUID()){
-            // only single node in the network
-            for(int i = 0; i < maxFingerTableSize ; i++){
-                FingerTableEntry entry = fingerTable.get(i);
-                entry.setSucc(ownNode);
-            }
-        }else {
-            for(int i = 0; i < maxFingerTableSize-1 ; i++){
-                fingerTable.get(i).setSucc(ownNode);
-            }
-            for(int i = 0; i < maxFingerTableSize ; i++){
-                FingerTableEntry entry = fingerTable.get(i);
-                int id = entry.getStart();
-                entry.setSucc(find_successor(id));
-            }
-
-        }
-        System.out.println("fingr table");
-        update_others();
-    }
+//    private static void initializeFingerTable() throws IOException, JSONRPC2SessionException {
+//        ownNode.setFingerTable(fingerTable);
+//
+//        for(int i = 0; i < maxFingerTableSize ; i++){
+//            FingerTableEntry entry = new FingerTableEntry();
+//            entry.setStart((int) ((ownGUID + Math.pow(2, i)) % maxNodesInTheNetwork));  // k + 2^i
+//            fingerTable.add(entry);
+//        }
+//
+//        for(int i = 0; i < maxFingerTableSize-1 ; i++){
+//            FingerTableEntry entry = fingerTable.get(i);
+//            entry.setIntervalBegin(entry.getStart());
+//            FingerTableEntry nextEntry = fingerTable.get(i+1);
+//            entry.setIntervalEnd(nextEntry.getStart());
+//        }
+//        FingerTableEntry lastEntry = fingerTable.get(maxFingerTableSize-1);
+//        lastEntry.setIntervalBegin(lastEntry.getStart());
+//        lastEntry.setIntervalEnd(fingerTable.get(0).getStart());
+//
+//        if(ownGUID == predecessor.getGUID()){
+//            // only single node in the network
+//            for(int i = 0; i < maxFingerTableSize ; i++){
+//                FingerTableEntry entry = fingerTable.get(i);
+//                entry.setSucc(ownNode);
+//            }
+//        }else {
+//            for(int i = 0; i < maxFingerTableSize-1 ; i++){
+//                fingerTable.get(i).setSucc(ownNode);
+//            }
+//            for(int i = 0; i < maxFingerTableSize ; i++){
+//                FingerTableEntry entry = fingerTable.get(i);
+//                int id = entry.getStart();
+//                entry.setSucc(find_successor(id));
+//            }
+//
+//        }
+//        System.out.println("fingr table");
+//        update_others();
+//    }
 
     private static void update_others() {
     }

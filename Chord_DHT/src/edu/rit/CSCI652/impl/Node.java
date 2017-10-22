@@ -1,11 +1,5 @@
 package edu.rit.CSCI652.impl;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-
 import java.io.Serializable;
 import java.net.InetAddress;
 import java.util.List;
@@ -17,7 +11,7 @@ import java.util.List;
 
 public class Node implements Serializable{
 
-    private String ip;
+    private InetAddress ip;
     private int GUID ;
     private int port;
 
@@ -43,11 +37,11 @@ public class Node implements Serializable{
         this.GUID = GUID;
     }
 
-    public String getIp() {
+    public InetAddress getIp() {
         return ip;
     }
 
-    public void setIp(String ip) {
+    public void setIp(InetAddress ip) {
         this.ip = ip;
     }
 
@@ -63,7 +57,7 @@ public class Node implements Serializable{
 
     }
 
-    public Node(int GUID, String ip, int port){
+    public Node(int GUID, InetAddress ip, int port){
         this.GUID = GUID;
         this.ip = ip;
         this.port = port;

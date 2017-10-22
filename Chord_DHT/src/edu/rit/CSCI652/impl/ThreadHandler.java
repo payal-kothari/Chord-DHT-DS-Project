@@ -1,5 +1,8 @@
 package edu.rit.CSCI652.impl;
 
+import javafx.print.Collation;
+import org.omg.CORBA.Object;
+
 import java.io.Serializable;
 import java.math.BigInteger;
 import java.net.Socket;
@@ -45,7 +48,8 @@ public class ThreadHandler extends Thread implements Serializable {
                         System.out.println("NewNode with ip " + "'" + nodeIp + "'" +" has joined the network");
                         System.out.println("GUID is : " + GUID);
                         ConcurrentHashMap globalTable = centralServer.getGlobalTable();
-                        globalTable.put(GUID, new Node(GUID, nodeIp.toString(), 7000));
+                        Node newNode = new Node(GUID, nodeIp, 8000);
+                        globalTable.put(GUID, newNode);
                         Node predecessor = findPredecessor(GUID);
                         Node successor = findSuccessor(GUID);
                         ObjectOutputStream outObject = new ObjectOutputStream(socket.getOutputStream());
@@ -59,6 +63,7 @@ public class ThreadHandler extends Thread implements Serializable {
                             outObject.writeObject(findSuccessor(nextStart));
                         }
                         outObject.flush();
+                        update_others(newNode);
                         System.out.println("");
                         break;
 
@@ -79,6 +84,28 @@ public class ThreadHandler extends Thread implements Serializable {
 
             }
         }
+    }
+
+    private void update_others(Node newNode) throws IOException {
+        ConcurrentHashMap globalTable = centralServer.getGlobalTable();
+        ObjectOutputStream outObject;
+
+        Collection values = globalTable.values();
+        Iterator iter = values.iterator();
+        while (iter.hasNext()){
+            Node node = (Node) iter.next();
+            if(newNode != node){
+                Socket socket = new Socket(node.getIp(), 8000);
+                if(socket.isConnected()) {
+                    outObject = new ObjectOutputStream(socket.getOutputStream());
+                    outObject.writeUTF("New Node");
+                    outObject.writeObject(newNode);
+                    outObject.flush();
+                }
+            }
+        }
+
+
     }
 
     private Node findSuccessor(int GUID) {

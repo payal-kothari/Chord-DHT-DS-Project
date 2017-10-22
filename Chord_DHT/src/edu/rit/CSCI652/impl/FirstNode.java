@@ -1,9 +1,7 @@
 package edu.rit.CSCI652.impl;
 
-import com.thetransactioncompany.jsonrpc2.JSONRPC2Request;
-import com.thetransactioncompany.jsonrpc2.JSONRPC2Response;
-import com.thetransactioncompany.jsonrpc2.client.JSONRPC2Session;
-import com.thetransactioncompany.jsonrpc2.client.JSONRPC2SessionException;
+
+//import com.thetransactioncompany.jsonrpc2.client.JSONRPC2SessionException;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -17,39 +15,76 @@ import java.util.*;
 public class FirstNode
 {
     private static URL serverURL = null;
-    private static int PORT = 8080;
+    private static int PORT = 8000;
     private static String centralServerIp = "localhost";
     private static Node predecessor = null;
     private static Node successor = null;
     private static int ownGUID = 0;
+
+    public static int getMaxFingerTableSize() {
+        return maxFingerTableSize;
+    }
+
     private static int maxFingerTableSize = 0;
     private static int maxNodesInTheNetwork = 0;
     private static Node ownNode = new Node();
+
+    public static Node getOwnNode() {
+        return ownNode;
+    }
+
+    public static List<FingerTableEntry> getFingerTable() {
+        return fingerTable;
+    }
+
     private static List<FingerTableEntry> fingerTable = new ArrayList<>();
     private static String ip = "localhost";
+    private static ServerSocket serverSocket;
 
     public static ServerSocket getServerSocket() {
         return serverSocket;
     }
 
-    private static ServerSocket serverSocket;
+    public static int getOwnGUID() {
+        return ownGUID;
+    }
 
 
-    public static void main(String[] args) throws IOException, ClassNotFoundException, JSONRPC2SessionException {
-//        serverSocket = new ServerSocket(PORT);
+    public static Node getPredecessor() {
+        return predecessor;
+    }
+
+    public static Node getSuccessor() {
+        return successor;
+    }
+
+    public static void setPredecessor(Node predecessor) {
+        FirstNode.predecessor = predecessor;
+    }
+
+    public static void setSuccessor(Node successor) {
+        FirstNode.successor = successor;
+    }
+
+
+
+    public static void main(String[] args) throws IOException, ClassNotFoundException {
+        serverSocket = new ServerSocket(PORT);
         System.out.println("starting thread");
+        new incomingNotifHandler().start();
+
 //        new JSON_RPC_Subclass(ownNode, fingerTable, maxFingerTableSize).start();
         init();
     }
 
-    private static void init() throws IOException, ClassNotFoundException, JSONRPC2SessionException {
+    private static void init() throws IOException, ClassNotFoundException {
 
         Scanner scanner = new Scanner(System.in);
         while (true){
             System.out.print("\n\n");
             System.out.println("***************************************************************************************");
             System.out.println("1 - Join the network");
-            System.out.println("2 - Display finger table ");
+            System.out.println("2 - Display finger table, predecessor, successor ");
             System.out.println("3 - Upload a file");
             System.out.println("4 - Search a file");
             System.out.println("5 - Leave the network");
@@ -63,8 +98,8 @@ public class FirstNode
 
                 case 1 :
                     System.out.println("Joining the network");
-                    Socket subscriberSocket = new Socket(centralServerIp, 2000);
-                    ObjectInputStream objectInStream = new ObjectInputStream(subscriberSocket.getInputStream());
+                    Socket socket = new Socket(centralServerIp, 2000);
+                    ObjectInputStream objectInStream = new ObjectInputStream(socket.getInputStream());
                     int reconnectPort = objectInStream.readInt();
                     System.out.println("received sec port");
                     Socket reconnectSocket = new Socket(centralServerIp, reconnectPort);
@@ -76,7 +111,7 @@ public class FirstNode
                     maxNodesInTheNetwork = (int) Math.pow(2, maxFingerTableSize);
                     ownGUID = inputStream.readInt();
                     ownNode.setGUID(ownGUID);
-                    ownNode.setIp(reconnectSocket.getLocalAddress().toString());
+                    ownNode.setIp(reconnectSocket.getLocalAddress());
                     ownNode.setPort(8080);
                     predecessor = (Node) inputStream.readObject();
                     successor = (Node) inputStream.readObject();
@@ -89,6 +124,8 @@ public class FirstNode
                     break;
                 case 2 :
                     System.out.println("*******************  Finger Table  ******************** \n");
+                    System.out.println("Predecessor  : " + predecessor.getGUID());
+                    System.out.println("Successor  : " + successor.getGUID());
                     System.out.print(" Start ");
                     System.out.print("\t\t  Interval ");
                     System.out.print("\t\t\t\t   Successor \n");
@@ -105,7 +142,7 @@ public class FirstNode
         }
     }
 
-    private static void initializeFingerTable(ArrayList<Node> successorsList) throws MalformedURLException, JSONRPC2SessionException {
+    private static void initializeFingerTable(ArrayList<Node> successorsList)  {
         ownNode.setFingerTable(fingerTable);
 
         for(int i = 0; i < maxFingerTableSize ; i++){
@@ -132,7 +169,14 @@ public class FirstNode
     }
 
     private static void update_others() {
+
+
+
+
+
     }
+
+
 
 //    private static Node find_successor(int id) throws MalformedURLException, JSONRPC2SessionException {
 //        Node nRemote = find_predecessor(id);
