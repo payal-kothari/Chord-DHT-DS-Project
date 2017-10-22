@@ -20,7 +20,7 @@ public class CentralServer {
     private static Socket origSocket;
     private static HashSet<Integer> busyPorts = new HashSet<>();
     private static List<Integer> GUIDList = new ArrayList<>();
-    private static ConcurrentHashMap<String, InetAddress>  globalTable = new ConcurrentHashMap<>();
+    private static ConcurrentHashMap<Integer, Node>  globalTable = new ConcurrentHashMap<>();
 
 
     public static int getMaxFingerTableSize() {
@@ -35,7 +35,7 @@ public class CentralServer {
         return maxNodes;
     }
 
-    public static ConcurrentHashMap<String, InetAddress> getGlobalTable() {
+    public static ConcurrentHashMap<Integer, Node> getGlobalTable() {
         return globalTable;
     }
 

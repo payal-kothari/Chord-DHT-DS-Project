@@ -46,19 +46,23 @@ public class ThreadHandler extends Thread implements Serializable {
                         System.out.println("GUID is : " + GUID);
                         ConcurrentHashMap globalTable = centralServer.getGlobalTable();
                         globalTable.put(GUID, new Node(GUID, nodeIp.toString(), 7000));
-                        int predGUID = findPredecessor(GUID);
-                        Node node = (Node) globalTable.get(predGUID);
-                        String predIP = node.getIp();
-                        int predPort = node.getPort();
+                        Node predecessor = findPredecessor(GUID);
+                        Node successor = findSuccessor(GUID);
                         ObjectOutputStream outObject = new ObjectOutputStream(socket.getOutputStream());
                         outObject.writeInt(centralServer.getMaxFingerTableSize());
                         outObject.writeInt(GUID);
-                        outObject.writeInt(predGUID);
-                        outObject.writeUTF(predIP);
-                        outObject.writeInt(predPort);
+                        outObject.writeObject(predecessor);
+                        outObject.writeObject(successor);
+
+                        for(int i = 0; i < centralServer.getMaxFingerTableSize() ; i++){
+                            int nextStart = (int) ((GUID + Math.pow(2, i)) % centralServer.getMaxNodes());
+                            outObject.writeObject(findSuccessor(nextStart));
+                        }
                         outObject.flush();
                         System.out.println("");
                         break;
+
+
 
                 }
             } catch (NoSuchAlgorithmException e) {
@@ -77,7 +81,28 @@ public class ThreadHandler extends Thread implements Serializable {
         }
     }
 
-    private int findPredecessor(int GUID) {
+    private Node findSuccessor(int GUID) {
+
+        List<Integer> GUIDList = centralServer.getGUIDList();
+        Collections.sort(GUIDList);
+
+        int successor = GUID;
+        Iterator<Integer> iterator = GUIDList.iterator();
+        while (iterator.hasNext()) {
+            int nextID = iterator.next();
+            if (nextID > successor) {
+                successor = nextID;
+                break;
+            }
+        }
+        if (successor == GUID)
+            successor = Collections.min(GUIDList);   // to rotate around the chord circle
+
+        ConcurrentHashMap globalTable = centralServer.getGlobalTable();
+        return (Node) globalTable.get(successor);
+    }
+
+    private Node findPredecessor(int GUID) {
 
         List<Integer> GUIDList = centralServer.getGUIDList();
         Collections.sort(GUIDList, Collections.reverseOrder());
@@ -94,7 +119,8 @@ public class ThreadHandler extends Thread implements Serializable {
         if (predecessor == GUID)
             predecessor = Collections.max(GUIDList);   // to rotate around the chord circle
 
-        return predecessor;
+        ConcurrentHashMap globalTable = centralServer.getGlobalTable();
+        return (Node) globalTable.get(predecessor);
     }
 
 

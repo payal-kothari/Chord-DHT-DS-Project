@@ -36,9 +36,9 @@ public class FirstNode
 
 
     public static void main(String[] args) throws IOException, ClassNotFoundException, JSONRPC2SessionException {
-        serverSocket = new ServerSocket(PORT);
+//        serverSocket = new ServerSocket(PORT);
         System.out.println("starting thread");
-        new JSON_RPC_Subclass(ownNode, fingerTable, maxFingerTableSize).start();
+//        new JSON_RPC_Subclass(ownNode, fingerTable, maxFingerTableSize).start();
         init();
     }
 
@@ -49,9 +49,9 @@ public class FirstNode
             System.out.print("\n\n");
             System.out.println("***************************************************************************************");
             System.out.println("1 - Join the network");
-            System.out.println("2 - Upload a file");
-            System.out.println("3 - Search a file");
-            System.out.println("4 - Display finger table");
+            System.out.println("2 - Display finger table ");
+            System.out.println("3 - Upload a file");
+            System.out.println("4 - Search a file");
             System.out.println("5 - Leave the network");
             System.out.println("Enter an option : ");
 
@@ -75,28 +75,37 @@ public class FirstNode
                     maxFingerTableSize = inputStream.readInt();
                     maxNodesInTheNetwork = (int) Math.pow(2, maxFingerTableSize);
                     ownGUID = inputStream.readInt();
-                    predecessor = new Node();
-                    predecessor.setGUID(inputStream.readInt());
-                    predecessor.setIp(inputStream.readUTF());
-                    predecessor.setPort(inputStream.readInt());
                     ownNode.setGUID(ownGUID);
                     ownNode.setIp(reconnectSocket.getLocalAddress().toString());
                     ownNode.setPort(8080);
-                    successor = ownNode;
-                    initializeFingerTable();
+                    predecessor = (Node) inputStream.readObject();
+                    successor = (Node) inputStream.readObject();
+                    ArrayList<Node> fingerTableSuccessors = new ArrayList<>();
+                    for(int i = 0; i < maxFingerTableSize ; i++){
+                       fingerTableSuccessors.add((Node) inputStream.readObject());
+                    }
+                    initializeFingerTable(fingerTableSuccessors);
                     System.out.println("Joined the network");
                     break;
                 case 2 :
-                    System.out.println("Uploading a file");
-                    String filePath = "/Users/payalkothari/Documents/DS/Chord_Project/Chord_DHT/src/FileOne.txt";
-
+                    System.out.println("*******************  Finger Table  ******************** \n");
+                    System.out.print(" Start ");
+                    System.out.print("\t\t  Interval ");
+                    System.out.print("\t\t\t\t   Successor \n");
+                    for(int i =0; i< maxFingerTableSize; i++){
+                        FingerTableEntry entry = fingerTable.get(i);
+                        System.out.print("\n");
+                        System.out.print(" " + entry.getStart());
+                        System.out.print("\t\t\t     " + entry.getIntervalBegin() + "," + entry.getIntervalEnd());
+                        System.out.print("\t\t\t\t\t   " + entry.getSucc().getGUID());
+                    }
                     break;
             }
 
         }
     }
 
-    private static void initializeFingerTable() throws MalformedURLException, JSONRPC2SessionException {
+    private static void initializeFingerTable(ArrayList<Node> successorsList) throws MalformedURLException, JSONRPC2SessionException {
         ownNode.setFingerTable(fingerTable);
 
         for(int i = 0; i < maxFingerTableSize ; i++){
@@ -115,84 +124,51 @@ public class FirstNode
         lastEntry.setIntervalBegin(lastEntry.getStart());
         lastEntry.setIntervalEnd(fingerTable.get(0).getStart());
 
-        if(ownGUID == predecessor.getGUID()){
-            // only single node in the network
-            for(int i = 0; i < maxFingerTableSize ; i++){
+        for(int i = 0; i < maxFingerTableSize ; i++){
                 FingerTableEntry entry = fingerTable.get(i);
-                entry.setSucc(ownNode);
-            }
-        }else {
-            for(int i = 0; i < maxFingerTableSize-1 ; i++){
-                fingerTable.get(i).setSucc(ownNode);
-            }
-            for(int i = 0; i < maxFingerTableSize ; i++){
-                FingerTableEntry entry = fingerTable.get(i);
-                int id = entry.getStart();
-                entry.setSucc(find_successor(id));
-            }
-
+                entry.setSucc(successorsList.get(i));
         }
-
         update_others();
     }
 
     private static void update_others() {
     }
 
-    private static Node find_successor(int id) throws MalformedURLException, JSONRPC2SessionException {
-        Node nRemote = find_predecessor(id);
-        return nRemote.getFingerTable().get(1).getSucc();
-    }
-
-    private static Node find_predecessor(int id) throws MalformedURLException, JSONRPC2SessionException {
-        Node nRemote = ownNode;
-        int nRemoteGUID = nRemote.getGUID();
-        Node nRemoteSucc = nRemote.getFingerTable().get(1).getSucc();
-        int nRemoteSuccGUID = nRemoteSucc.getGUID();
-
-        while (!(nRemoteGUID < nRemoteSuccGUID && id > nRemoteGUID && id < nRemoteSuccGUID)
-                || !(nRemoteGUID > nRemoteSuccGUID && id > nRemoteGUID && id > 0)
-                || !(nRemoteGUID > nRemoteSuccGUID && id >= 0 && id < nRemoteSuccGUID) ){
-
-            System.out.println("remote ip : " + nRemote.getIp());
-            String urlString = "http:/" + nRemote.getIp() + ":8080";
-            serverURL = new URL("http://127.0.0.1:8080");
-
-            JSONRPC2Session mySession = new JSONRPC2Session(serverURL);
-
-            String method = "get_closest_preceding_finger";
-            int requestID = ownNode.getGUID();
-            HashMap param = new HashMap<>();
-            param.put("id", id);
-
-            JSONRPC2Request request = new JSONRPC2Request(method, param, requestID);
-            JSONRPC2Response response = null;
-
-            response = mySession.send(request);
-
-            if (response.indicatesSuccess()){
-                nRemote = (Node) response.getResult();
-            }
-        }
-        return nRemote;
-    }
-
-//    public static Node get_closest_preceding_finger(int id){
-//        int n = ownGUID;
-//
-//        for(int i = maxFingerTableSize-1; i >= 0; i--){
-//            Node ans = fingerTable.get(i).getSucc();
-//            int ansID = ans.getGUID();
-//            if((n < id && ansID > n && ansID < id)
-//                    || (n > id && ansID > n && ansID > 0)
-//                    || (n > id && ansID >= 0 && ansID < id)){
-//
-//                return fingerTable.get(i).getSucc();
-//
-//            }
-//        }
-//
-//        return ownNode;
+//    private static Node find_successor(int id) throws MalformedURLException, JSONRPC2SessionException {
+//        Node nRemote = find_predecessor(id);
+//        return nRemote.getFingerTable().get(1).getSucc();
 //    }
 
+//    private static Node find_predecessor(int id) throws MalformedURLException, JSONRPC2SessionException {
+//        Node nRemote = ownNode;
+//        int nRemoteGUID = nRemote.getGUID();
+//        Node nRemoteSucc = nRemote.getFingerTable().get(1).getSucc();
+//        int nRemoteSuccGUID = nRemoteSucc.getGUID();
+//
+//        while (!(nRemoteGUID < nRemoteSuccGUID && id > nRemoteGUID && id < nRemoteSuccGUID)
+//                || !(nRemoteGUID > nRemoteSuccGUID && id > nRemoteGUID && id > 0)
+//                || !(nRemoteGUID > nRemoteSuccGUID && id >= 0 && id < nRemoteSuccGUID) ){
+//
+//            System.out.println("remote ip : " + nRemote.getIp());
+//            String urlString = "http:/" + nRemote.getIp() + ":8080";
+//            serverURL = new URL("http://127.0.0.1:8080");
+//
+//            JSONRPC2Session mySession = new JSONRPC2Session(serverURL);
+//
+//            String method = "get_closest_preceding_finger";
+//            int requestID = ownNode.getGUID();
+//            HashMap param = new HashMap<>();
+//            param.put("id", id);
+//
+//            JSONRPC2Request request = new JSONRPC2Request(method, param, requestID);
+//            JSONRPC2Response response = null;
+//
+//            response = mySession.send(request);
+//
+//            if (response.indicatesSuccess()){
+//                nRemote = (Node) response.getResult();
+//            }
+//        }
+//        return nRemote;
+//    }
 }
