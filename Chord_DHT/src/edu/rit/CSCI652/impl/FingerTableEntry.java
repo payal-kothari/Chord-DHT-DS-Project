@@ -1,11 +1,13 @@
 package edu.rit.CSCI652.impl;
 
 
+import java.io.Serializable;
+
 /**
  * Created by payalkothari on 10/18/17.
  */
 
-public class FingerTableEntry {
+public class FingerTableEntry implements Serializable{
 
     int start;
     int intervalBegin;

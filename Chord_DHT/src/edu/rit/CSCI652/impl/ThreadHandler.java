@@ -75,7 +75,6 @@ public class ThreadHandler extends Thread implements Serializable {
                         MessageDigest messageDigest = MessageDigest.getInstance("SHA-1");
                         messageDigest.reset();
                         byte[] byteArr = new byte[1020];
-                        int fileNum = centralServer.getFileNum();
                         FileOutputStream fileOutputStream = new FileOutputStream(centralServer.getFileStorageFolderPath() + fileName);
                         BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(fileOutputStream);
                         InputStream inputStream = socket.getInputStream();
@@ -94,6 +93,8 @@ public class ThreadHandler extends Thread implements Serializable {
                         fileOutputStream.close();
                         socket.close();
                         System.out.println("File id : " + fileHashID);
+                        HashMap map = centralServer.getFilesMap();
+                        map.put(fileName, fileHashID);
                         Node contactNode;
                         if(centralServer.getGUIDList().contains(fileHashID)){
                             contactNode =  centralServer.getGlobalTable().get(fileHashID);
@@ -101,13 +102,39 @@ public class ThreadHandler extends Thread implements Serializable {
                             contactNode = findSuccessor(fileHashID);
                         }
                         sendFile(contactNode, fileHashID, fileName);
-                        centralServer.setFileNum(++fileNum);
                         break;
-
+                    case "Search" :
+                        String fileNameToSearch = objectInStream.readUTF();
+                        Node requestingNode =  (Node) objectInStream.readObject();
+                        System.out.println("searching " + fileNameToSearch);
+                        Map fileHashMap = centralServer.getFilesMap();
+                        int hashId = 0;
+                        if(fileHashMap.get(fileNameToSearch) != null){
+                            hashId = (int) fileHashMap.get(fileNameToSearch);
+                            Node succ = findSuccessor(hashId);
+                            Socket socket = new Socket(succ.getIp(), succ.getPort());
+                            ObjectOutputStream outObject2 = new ObjectOutputStream(socket.getOutputStream());
+                            outObject2.writeUTF("ProcessRequest");
+                            outObject2.writeUTF(fileNameToSearch);
+                            outObject2.writeObject(requestingNode);
+                            outObject2.flush();
+                            outObject2.close();
+                        }else {
+                            System.out.println("File is not available");
+                            Socket socket = new Socket(requestingNode.getIp(), requestingNode.getPort());
+                            ObjectOutputStream outObject2 = new ObjectOutputStream(socket.getOutputStream());
+                            outObject2.writeUTF("PrintResult");
+                            outObject2.writeUTF("File is not available");
+                            outObject2.flush();
+                            outObject2.close();
+                        }
+                        break;
                 }
             } catch (NoSuchAlgorithmException e) {
                 e.printStackTrace();
             } catch (IOException e) {
+                e.printStackTrace();
+            } catch (ClassNotFoundException e) {
                 e.printStackTrace();
             } finally {
                 try {

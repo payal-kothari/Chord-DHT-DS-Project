@@ -20,6 +20,15 @@ public class ClientNode
     private static String fileStorageFolderPath;
     //private static String filesOnThisMCPath = "/home/stu10/s16/pak4180/Distributed Systems/Chord/edu/rit/CSCI652/impl/";
     private static String filesOnThisMCPath = "/Users/payalkothari/Documents/DS/Chord_Project/Chord_DHT/src/edu/rit/CSCI652/impl/";
+    //private static String downloadsFolderPath = "/home/stu10/s16/pak4180/Distributed Systems/Chord/edu/rit/CSCI652/impl/downloads/";
+    private static String downloadsFolderPath = "/Users/payalkothari/Documents/DS/Chord_Project/Chord_DHT/src/edu/rit/CSCI652/impl/downloads/";
+
+
+
+    public static String getDownloadsFolderPath() {
+        return downloadsFolderPath;
+    }
+
 
     public static HashMap<Integer, List<String>> getFileHashIDAndNameMap() {
         return fileHashIDAndNameMap;
@@ -127,6 +136,10 @@ public class ClientNode
                     if(!dir.exists()){
                         dir.mkdirs();
                     }
+                    File dir2 = new File(downloadsFolderPath);
+                    if(!dir2.exists()){
+                        dir2.mkdirs();
+                    }
                     ownNode.setIp(reconnectSocket.getLocalAddress());
                     ownNode.setPort(ServerSocketPort);
                     predecessor = (Node) inputStream.readObject();
@@ -155,11 +168,12 @@ public class ClientNode
                     break;
 
                 case 3 :
-                    System.out.println("Uploading a file");
+//                    System.out.println("Uploading a file");
+                    System.out.println("Enter the file name : ");
                     Socket socketToUpload = new Socket(centralServerIp, 2000);
                     ObjectInputStream objectInStream3 = new ObjectInputStream(socketToUpload.getInputStream());
                     int reconnectPort3 = objectInStream3.readInt();
-                    System.out.println("received sec port");
+//                    System.out.println("received sec port");
                     Socket reconnectSocket3 = new Socket(centralServerIp, reconnectPort3);
                     OutputStream outputStream = reconnectSocket3.getOutputStream();
                     ObjectOutputStream outObject3 = new ObjectOutputStream(outputStream);
@@ -198,6 +212,20 @@ public class ClientNode
                             System.out.print(name + ", ");
                         }
                     }
+                    break;
+                case 5 :
+                    System.out.println("Enter the file name");
+                    String fileName1 = scanner.nextLine();
+                    Socket socket5 = new Socket(centralServerIp, 2000);
+                    ObjectInputStream objectInStream5 = new ObjectInputStream(socket5.getInputStream());
+                    int reconnectPort5 = objectInStream5.readInt();
+                    Socket reconnectSocket5 = new Socket(centralServerIp, reconnectPort5);
+                    OutputStream outputStream5 = reconnectSocket5.getOutputStream();
+                    ObjectOutputStream outObject5 = new ObjectOutputStream(outputStream5);
+                    outObject5.writeUTF("Search");
+                    outObject5.writeUTF(fileName1);
+                    outObject5.writeObject(ownNode);
+                    outObject5.flush();
                     break;
             }
 

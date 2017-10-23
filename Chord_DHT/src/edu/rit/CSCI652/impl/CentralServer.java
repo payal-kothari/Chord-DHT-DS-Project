@@ -33,6 +33,12 @@ public class CentralServer {
     private static ConcurrentHashMap<Integer, Node>  globalTable = new ConcurrentHashMap<>();
     //private static String fileStorageFolderPath = "/home/stu10/s16/pak4180/Distributed Systems/Chord/edu/rit/CSCI652/impl/ServerFileStorage";
     private static String fileStorageFolderPath = "/Users/payalkothari/Documents/DS/Chord_Project/Chord_DHT/src/edu/rit/CSCI652/impl/ServerFileStorage";
+    private static HashMap<String, Integer> filesMap = new HashMap<>();
+
+
+    public static HashMap<String, Integer> getFilesMap() {
+        return filesMap;
+    }
 
     public static String getFileStorageFolderPath() {
         return fileStorageFolderPath;

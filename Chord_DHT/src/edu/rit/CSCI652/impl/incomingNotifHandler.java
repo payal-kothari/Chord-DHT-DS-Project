@@ -15,7 +15,6 @@ public class incomingNotifHandler extends Thread{
     public void run(){
         try {
         while (true){
-            System.out.println("waiting for connection ");
                 Socket socket = ClientNode.getServerSocket().accept();
 
                 ObjectInputStream objectInStream = new ObjectInputStream(socket.getInputStream());
@@ -61,9 +60,50 @@ public class incomingNotifHandler extends Thread{
                         socket.close();
 
                         break;
+                    case "ProcessRequest" :
+                        String fileNameToSearch = objectInStream.readUTF();
+                        Node requestingNode = (Node) objectInStream.readObject();
+                        Socket socketToReqNode = new Socket(requestingNode.getIp(), requestingNode.getPort());
+                        OutputStream outputStream = socketToReqNode.getOutputStream();
+                        ObjectOutputStream outObject2 = new ObjectOutputStream(outputStream);
+                        outObject2.writeUTF("Download");
+                        outObject2.writeUTF(fileNameToSearch);
+                        outObject2.flush();
+                        System.out.println("Sending file to node : " + requestingNode.getGUID());
+
+                        File file = new File(ClientNode.getFileStorageFolderPath() + fileNameToSearch);
+                        BufferedInputStream bufferedInputStream = new BufferedInputStream(new FileInputStream(file));
+
+                        long fileLen = file.length();
+                        byte [] byteArray  = new byte [(int)fileLen];
+                        bufferedInputStream.read(byteArray,0,byteArray.length);
+                        outputStream.write(byteArray,0,byteArray.length);
+                        outputStream.flush();
+                        outputStream.close();
+                        bufferedInputStream.close();
+                        socketToReqNode.close();
+                        break;
+
+                    case "Download" :
+                        String fileName2 = objectInStream.readUTF();
+                        byte[] byteArr2 = new byte[1020];
+                        FileOutputStream fileOutputStream2 = new FileOutputStream(ClientNode.getDownloadsFolderPath() +  fileName2);
+                        BufferedOutputStream bufferedOutputStream2 = new BufferedOutputStream(fileOutputStream2);
+                        InputStream inputStream2 = socket.getInputStream();
+                        int bytesRead2 = 0;
+                        while( (bytesRead2=inputStream2.read(byteArr2))!=-1){
+                            bufferedOutputStream2.write(byteArr2, 0, bytesRead2);
+                        }
+                        bufferedOutputStream2.flush();
+                        bufferedOutputStream2.close();
+                        inputStream2.close();
+                        fileOutputStream2.close();
+                        break;
+                    case "PrintResult" :
+                        String result = objectInStream.readUTF();
+                        System.out.println(result);
+                        break;
                 }
-
-
             }
 
         }catch (IOException e) {
