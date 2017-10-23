@@ -129,6 +129,17 @@ public class ThreadHandler extends Thread implements Serializable {
                             outObject2.close();
                         }
                         break;
+                    case "Leave" :
+                        Node nodeAboutToLeave = (Node) objectInStream.readObject();
+                        Node succNode = (Node) objectInStream.readObject();
+                        Node predNode = (Node) objectInStream.readObject();
+                        List<Integer> list = centralServer.getGUIDList();
+                        list.remove((Integer) nodeAboutToLeave.getGUID());
+                        ConcurrentHashMap globalTableMap = centralServer.getGlobalTable();
+                        globalTableMap.remove(nodeAboutToLeave.getGUID());
+                        update_others2(nodeAboutToLeave, succNode, predNode);
+                        break;
+
                 }
             } catch (NoSuchAlgorithmException e) {
                 e.printStackTrace();
@@ -146,6 +157,29 @@ public class ThreadHandler extends Thread implements Serializable {
 
             }
         }
+    }
+
+    private void update_others2(Node nodeAboutToLeave, Node succNode, Node predNode) throws IOException {
+
+        ConcurrentHashMap globalTable = centralServer.getGlobalTable();
+        ObjectOutputStream outObject;
+
+        Collection values = globalTable.values();
+        Iterator iter = values.iterator();
+        while (iter.hasNext()){
+            Node node = (Node) iter.next();
+            Socket socket = new Socket(node.getIp(), node.getPort());
+            if(socket.isConnected()) {
+                outObject = new ObjectOutputStream(socket.getOutputStream());
+                outObject.writeUTF("Change PredSucc");
+                outObject.writeObject(nodeAboutToLeave);
+                outObject.writeObject(succNode);
+                outObject.writeObject(predNode);
+                outObject.flush();
+            }
+            socket.close();
+        }
+
     }
 
     private void sendFile(Node contactNode, int fileHashID, String fileName) throws IOException {

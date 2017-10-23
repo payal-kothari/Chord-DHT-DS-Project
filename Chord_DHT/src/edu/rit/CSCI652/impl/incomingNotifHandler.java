@@ -103,6 +103,21 @@ public class incomingNotifHandler extends Thread{
                         String result = objectInStream.readUTF();
                         System.out.println(result);
                         break;
+
+                    case "Change PredSucc" :
+                        Node oldSucc = (Node) objectInStream.readObject();
+                        Node newSucc = (Node) objectInStream.readObject();
+                        Node newPred = (Node) objectInStream.readObject();
+                        int succGuid = ClientNode.getSuccessor().getGUID();
+                        if(succGuid == oldSucc.getGUID()){
+                            ClientNode.setSuccessor(newSucc);
+                        }
+                        int predGuid = ClientNode.getPredecessor().getGUID();
+                        if(predGuid == oldSucc.getGUID()){
+                            ClientNode.setPredecessor(newPred);
+                        }
+                        update_predSucc(oldSucc, newSucc);
+                        break;
                 }
             }
 
@@ -110,6 +125,19 @@ public class incomingNotifHandler extends Thread{
             e.printStackTrace();
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
+        }
+    }
+
+    private void update_predSucc(Node oldSucc, Node newSucc) {
+        List<FingerTableEntry> fingerTable =  ClientNode.getFingerTable();
+        int tableSize = ClientNode.getMaxFingerTableSize();
+
+        for (int i = 0; i < tableSize; i++){
+            FingerTableEntry entry = fingerTable.get(i);
+            int succ = entry.getSucc().getGUID();
+            if(succ == oldSucc.getGUID()){
+                entry.setSucc(newSucc);
+            }
         }
     }
 

@@ -227,6 +227,50 @@ public class ClientNode
                     outObject5.writeObject(ownNode);
                     outObject5.flush();
                     break;
+
+                case 6 :
+                    File direct = new File(fileStorageFolderPath);
+                    File[] list = direct.listFiles();
+                    if (list != null) {
+                        for (File f : list) {
+                            int hashID = getFileHash(f.getName());
+                            if(hashID != -1){
+                                Socket socketSucc = new Socket(successor.getIp(), successor.getPort());
+                                OutputStream outputStream6 = socketSucc.getOutputStream();
+                                ObjectOutputStream outObjectSucc = new ObjectOutputStream(outputStream6);
+                                outObjectSucc.writeUTF("Store File");
+                                System.out.println("Sending file to node : " + successor.getGUID());
+                                System.out.println(" Ip is : " + successor.getIp() + "  " + successor.getPort());
+                                outObjectSucc.writeInt(hashID);
+                                outObjectSucc.writeUTF(f.getName());
+                                outObjectSucc.flush();
+                                outObjectSucc.close();
+                                BufferedInputStream bufferedInputStreamSucc = new BufferedInputStream(new FileInputStream(f));
+                                long fLen = f.length();
+                                byte [] byteArr6  = new byte [(int)fLen];
+                                bufferedInputStreamSucc.read(byteArr6,0,byteArr6.length);
+                                outputStream6.write(byteArr6,0,byteArr6.length);
+                                outputStream6.flush();
+                                outputStream6.close();
+                                bufferedInputStreamSucc.close();
+                                socketSucc.close();
+                                f.delete();
+                                System.out.println("file deleted");
+                            }
+                        }
+                    }
+                    Socket socket6 = new Socket(centralServerIp, 2000);
+                    ObjectInputStream objectInStream6 = new ObjectInputStream(socket6.getInputStream());
+                    int reconnectPort6 = objectInStream6.readInt();
+                    Socket reconnectSocket6 = new Socket(centralServerIp, reconnectPort6);
+                    OutputStream outputStream6 = reconnectSocket6.getOutputStream();
+                    ObjectOutputStream outObject6 = new ObjectOutputStream(outputStream6);
+                    outObject6.writeUTF("Leave");
+                    outObject6.writeObject(ownNode);
+                    outObject6.writeObject(successor);
+                    outObject6.writeObject(predecessor);
+                    outObject6.flush();
+                    break;
             }
 
         }
@@ -255,5 +299,18 @@ public class ClientNode
                 FingerTableEntry entry = fingerTable.get(i);
                 entry.setSucc(successorsList.get(i));
         }
+    }
+
+    public static int getFileHash(String fileName) {
+        Set<Map.Entry<Integer, List<String>>> entrySet = fileHashIDAndNameMap.entrySet();
+        Iterator<Map.Entry<Integer, List<String>>> entrySetIter = entrySet.iterator();
+        while (entrySetIter.hasNext()){
+            Map.Entry entry = entrySetIter.next();
+            List<String> files = (List<String>) entry.getValue();
+            if(files.contains(fileName)){
+                return (int) entry.getKey();
+            }
+        }
+        return -1;
     }
 }
