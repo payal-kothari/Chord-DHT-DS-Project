@@ -136,6 +136,10 @@ public class incomingNotifHandler extends Thread{
         int newNodeGUID = newNode.getGUID();
         int succGUID = oldSucc.getGUID();
 
+        if(newNodeGUID == GUID){
+            return newNode;
+        }
+
         int max = Math.max(newNodeGUID, succGUID);
         int min = Math.min(newNodeGUID, succGUID);
 

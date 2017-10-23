@@ -170,6 +170,7 @@ public class ThreadHandler extends Thread implements Serializable {
 
         List<Integer> GUIDList = centralServer.getGUIDList();
         Collections.sort(GUIDList);
+        int flag = 0;
 
         int successor = GUID;
         Iterator<Integer> iterator = GUIDList.iterator();
@@ -177,10 +178,11 @@ public class ThreadHandler extends Thread implements Serializable {
             int nextID = iterator.next();
             if (nextID >= successor) {
                 successor = nextID;
+                flag = 1;
                 break;
             }
         }
-        if (successor == GUID)
+        if (flag == 0)
             successor = Collections.min(GUIDList);   // to rotate around the chord circle
 
         ConcurrentHashMap globalTable = centralServer.getGlobalTable();
