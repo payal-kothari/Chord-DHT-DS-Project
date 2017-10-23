@@ -10,16 +10,25 @@ import java.util.*;
  */
 public class ClientNode
 {
-    private static int ServerSocketPort = 8000;
+    private static int ServerSocketPort = 8780;
+    //private static String centralServerIp = "129.21.30.37";  // queeg
     private static String centralServerIp = "localhost";
     private static Node predecessor = null;
     private static Node successor = null;
     private static int ownGUID = 0;
     private static HashMap<Integer, List<String>> fileHashIDAndNameMap = new HashMap<>();
+    private static String fileStorageFolderPath;
+    //private static String filesOnThisMCPath = "/home/stu10/s16/pak4180/Distributed Systems/Chord/edu/rit/CSCI652/impl/";
+    private static String filesOnThisMCPath = "/Users/payalkothari/Documents/DS/Chord_Project/Chord_DHT/src/edu/rit/CSCI652/impl/";
 
     public static HashMap<Integer, List<String>> getFileHashIDAndNameMap() {
         return fileHashIDAndNameMap;
     }
+
+    public static String getFileStorageFolderPath() {
+        return fileStorageFolderPath;
+    }
+
 
     public static int getMaxFingerTableSize() {
         return maxFingerTableSize;
@@ -112,7 +121,9 @@ public class ClientNode
                     maxNodesInTheNetwork = (int) Math.pow(2, maxFingerTableSize);
                     ownGUID = inputStream.readInt();
                     ownNode.setGUID(ownGUID);
-                    File dir = new File("/Users/payalkothari/Documents/DS/Chord_Project/Chord_DHT/src/edu/rit/CSCI652/impl/Client " + ownGUID + "FileStorage");
+                    // fileStorageFolderPath = "/home/stu10/s16/pak4180/Distributed Systems/Chord/edu/rit/CSCI652/impl/Client " + ownGUID + "FileStorage/";
+                    fileStorageFolderPath = "/Users/payalkothari/Documents/DS/Chord_Project/Chord_DHT/src/edu/rit/CSCI652/impl/Client " + ownGUID + "FileStorage/";
+                    File dir = new File(fileStorageFolderPath);
                     if(!dir.exists()){
                         dir.mkdirs();
                     }
@@ -156,7 +167,7 @@ public class ClientNode
                     String fileName = scanner.nextLine();
                     outObject3.writeUTF(fileName);
                     outObject3.flush();
-                    File file = new File("/Users/payalkothari/Documents/DS/Chord_Project/Chord_DHT/src/edu/rit/CSCI652/impl/" + fileName);
+                    File file = new File(filesOnThisMCPath + fileName);
                     BufferedInputStream bufferedInputStream = new BufferedInputStream(new FileInputStream(file));
                     long fileLen = file.length();
                     byte [] byteArr  = new byte [(int)fileLen];

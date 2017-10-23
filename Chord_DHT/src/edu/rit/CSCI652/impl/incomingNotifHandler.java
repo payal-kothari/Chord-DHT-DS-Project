@@ -15,9 +15,13 @@ public class incomingNotifHandler extends Thread{
     public void run(){
         try {
         while (true){
+            System.out.println("waiting for connection ");
                 Socket socket = ClientNode.getServerSocket().accept();
+
                 ObjectInputStream objectInStream = new ObjectInputStream(socket.getInputStream());
                 String in = objectInStream.readUTF();
+
+            System.out.println("accepted a connection for : " + in);
                 switch (in){
                     case "New Node" :
                         System.out.println("******  New node has joined the network, updating the values......");
@@ -27,8 +31,8 @@ public class incomingNotifHandler extends Thread{
                         ClientNode.setPredecessor(find_predecessor(ClientNode.getOwnGUID(), ClientNode.getPredecessor()));
 
                         update_fingerTable();
-                        check_files();
-
+//                        check_files();
+                        break;
                     case "Store File" :
                         System.out.println("Receiving a file from server");
                         int fileHashId = objectInStream.readInt();
@@ -43,7 +47,7 @@ public class incomingNotifHandler extends Thread{
                         }
                         Map map= ClientNode.getFileHashIDAndNameMap();
                         byte[] byteArr = new byte[1020];
-                        FileOutputStream fileOutputStream = new FileOutputStream("/Users/payalkothari/Documents/DS/Chord_Project/Chord_DHT/src/edu/rit/CSCI652/impl/Client "  + ClientNode.getOwnGUID() + "FileStorage/" + fileName);
+                        FileOutputStream fileOutputStream = new FileOutputStream(ClientNode.getFileStorageFolderPath() +  fileName);
                         BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(fileOutputStream);
                         InputStream inputStream = socket.getInputStream();
                         int bytesRead = 0;
@@ -67,8 +71,6 @@ public class incomingNotifHandler extends Thread{
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
-
-
     }
 
     private void check_files() throws IOException {
@@ -103,7 +105,7 @@ public class incomingNotifHandler extends Thread{
         outObject.flush();
         System.out.println("Sending file to node : " + contactNode.getGUID());
 
-        File file = new File("/Users/payalkothari/Documents/DS/Chord_Project/Chord_DHT/src/edu/rit/CSCI652/impl/Client " + ClientNode.getOwnGUID() + "FileStorage/" + fileName);
+        File file = new File(ClientNode.getFileStorageFolderPath()  + fileName);
         BufferedInputStream bufferedInputStream = new BufferedInputStream(new FileInputStream(file));
 
         long fileLen = file.length();

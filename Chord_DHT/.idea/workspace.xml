@@ -19,11 +19,13 @@
       <file leaf-file-name="ClientNode.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/edu/rit/CSCI652/impl/ClientNode.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="240">
-              <caret line="180" column="49" lean-forward="false" selection-start-line="180" selection-start-column="49" selection-end-line="180" selection-end-column="49" />
+            <state relative-caret-position="644">
+              <caret line="124" column="20" lean-forward="false" selection-start-line="124" selection-start-column="20" selection-end-line="124" selection-end-column="20" />
               <folding>
-                <element signature="e#557#558#0" expanded="true" />
-                <element signature="e#600#601#0" expanded="true" />
+                <element signature="e#933#934#0" expanded="true" />
+                <element signature="e#976#977#0" expanded="true" />
+                <element signature="e#1031#1032#0" expanded="true" />
+                <element signature="e#1075#1076#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -32,8 +34,8 @@
       <file leaf-file-name="incomingNotifHandler.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/edu/rit/CSCI652/impl/incomingNotifHandler.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="255">
-              <caret line="78" column="31" lean-forward="true" selection-start-line="78" selection-start-column="31" selection-end-line="78" selection-end-column="31" />
+            <state relative-caret-position="360">
+              <caret line="27" column="41" lean-forward="true" selection-start-line="27" selection-start-column="41" selection-end-line="27" selection-end-column="41" />
               <folding />
             </state>
           </provider>
@@ -42,9 +44,12 @@
       <file leaf-file-name="CentralServer.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/edu/rit/CSCI652/impl/CentralServer.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-405">
-              <caret line="15" column="28" lean-forward="false" selection-start-line="15" selection-start-column="28" selection-end-line="15" selection-end-column="28" />
-              <folding />
+            <state relative-caret-position="209">
+              <caret line="34" column="4" lean-forward="false" selection-start-line="34" selection-start-column="4" selection-end-line="34" selection-end-column="4" />
+              <folding>
+                <element signature="e#1371#1372#0" expanded="true" />
+                <element signature="e#1415#1416#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -52,8 +57,8 @@
       <file leaf-file-name="ThreadHandler.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/edu/rit/CSCI652/impl/ThreadHandler.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="434">
-              <caret line="144" column="22" lean-forward="false" selection-start-line="144" selection-start-column="22" selection-end-line="144" selection-end-column="22" />
+            <state relative-caret-position="209">
+              <caret line="148" column="17" lean-forward="false" selection-start-line="148" selection-start-column="17" selection-end-line="148" selection-end-column="17" />
               <folding />
             </state>
           </provider>
@@ -70,7 +75,11 @@
     <option name="CHANGED_PATHS">
       <list>
         <option value="$PROJECT_DIR$/src/edu/rit/CSCI652/impl/JSON_RPC_Subclass.java" />
+        <option value="$PROJECT_DIR$/src/edu/rit/CSCI652/impl/e2.txt" />
+        <option value="$PROJECT_DIR$/src/edu/rit/CSCI652/impl/e3.txt" />
+        <option value="$PROJECT_DIR$/src/edu/rit/CSCI652/impl/e4.txt" />
         <option value="$PROJECT_DIR$/src/edu/rit/CSCI652/impl/ThreadHandler.java" />
+        <option value="$PROJECT_DIR$/src/edu/rit/CSCI652/impl/CentralServer.java" />
         <option value="$PROJECT_DIR$/src/edu/rit/CSCI652/impl/ClientNode.java" />
         <option value="$PROJECT_DIR$/src/edu/rit/CSCI652/impl/incomingNotifHandler.java" />
       </list>
@@ -390,8 +399,8 @@
     </list>
     <recent_temporary>
       <list size="2">
-        <item index="0" class="java.lang.String" itemvalue="Application.CentralServer" />
-        <item index="1" class="java.lang.String" itemvalue="Application.ClientNode" />
+        <item index="0" class="java.lang.String" itemvalue="Application.ClientNode" />
+        <item index="1" class="java.lang.String" itemvalue="Application.CentralServer" />
       </list>
     </recent_temporary>
   </component>
@@ -451,18 +460,18 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/edu/rit/CSCI652/impl/incomingNotifHandler.java</url>
-          <line>44</line>
-          <properties />
-          <option name="timeStamp" value="1" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/edu/rit/CSCI652/impl/incomingNotifHandler.java</url>
-          <line>87</line>
+          <line>89</line>
           <properties />
           <option name="timeStamp" value="2" />
         </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/edu/rit/CSCI652/impl/ClientNode.java</url>
+          <line>167</line>
+          <properties />
+          <option name="timeStamp" value="3" />
+        </line-breakpoint>
       </breakpoints>
-      <option name="time" value="3" />
+      <option name="time" value="4" />
     </breakpoint-manager>
     <watches-manager />
   </component>
@@ -495,37 +504,66 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/edu/rit/CSCI652/impl/e2.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="3" lean-forward="false" selection-start-line="0" selection-start-column="3" selection-end-line="0" selection-end-column="3" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/edu/rit/CSCI652/impl/e3.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="11" lean-forward="false" selection-start-line="0" selection-start-column="11" selection-end-line="0" selection-end-column="11" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/edu/rit/CSCI652/impl/e4.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="10" lean-forward="false" selection-start-line="0" selection-start-column="10" selection-end-line="0" selection-end-column="10" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/edu/rit/CSCI652/impl/CentralServer.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-405">
-          <caret line="15" column="28" lean-forward="false" selection-start-line="15" selection-start-column="28" selection-end-line="15" selection-end-column="28" />
-          <folding />
+        <state relative-caret-position="209">
+          <caret line="34" column="4" lean-forward="false" selection-start-line="34" selection-start-column="4" selection-end-line="34" selection-end-column="4" />
+          <folding>
+            <element signature="e#1371#1372#0" expanded="true" />
+            <element signature="e#1415#1416#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/edu/rit/CSCI652/impl/ThreadHandler.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="434">
-          <caret line="144" column="22" lean-forward="false" selection-start-line="144" selection-start-column="22" selection-end-line="144" selection-end-column="22" />
+        <state relative-caret-position="209">
+          <caret line="148" column="17" lean-forward="false" selection-start-line="148" selection-start-column="17" selection-end-line="148" selection-end-column="17" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/edu/rit/CSCI652/impl/ClientNode.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="240">
-          <caret line="180" column="49" lean-forward="false" selection-start-line="180" selection-start-column="49" selection-end-line="180" selection-end-column="49" />
+        <state relative-caret-position="644">
+          <caret line="124" column="20" lean-forward="false" selection-start-line="124" selection-start-column="20" selection-end-line="124" selection-end-column="20" />
           <folding>
-            <element signature="e#557#558#0" expanded="true" />
-            <element signature="e#600#601#0" expanded="true" />
+            <element signature="e#933#934#0" expanded="true" />
+            <element signature="e#976#977#0" expanded="true" />
+            <element signature="e#1031#1032#0" expanded="true" />
+            <element signature="e#1075#1076#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/edu/rit/CSCI652/impl/incomingNotifHandler.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="255">
-          <caret line="78" column="31" lean-forward="true" selection-start-line="78" selection-start-column="31" selection-end-line="78" selection-end-column="31" />
+        <state relative-caret-position="360">
+          <caret line="27" column="41" lean-forward="true" selection-start-line="27" selection-start-column="41" selection-end-line="27" selection-end-column="41" />
           <folding />
         </state>
       </provider>

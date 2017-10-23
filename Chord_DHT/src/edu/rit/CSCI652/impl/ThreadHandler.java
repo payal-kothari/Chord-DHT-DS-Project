@@ -50,7 +50,7 @@ public class ThreadHandler extends Thread implements Serializable {
                         System.out.println("NewNode with ip " + "'" + nodeIp + "'" +" has joined the network");
                         System.out.println("GUID is : " + GUID);
                         ConcurrentHashMap globalTable = centralServer.getGlobalTable();
-                        Node newNode = new Node(GUID, nodeIp, 8000);
+                        Node newNode = new Node(GUID, nodeIp, 8780);
                         globalTable.put(GUID, newNode);
                         Node predecessor = findPredecessor(GUID);
                         Node successor = findSuccessor(GUID);
@@ -76,7 +76,7 @@ public class ThreadHandler extends Thread implements Serializable {
                         messageDigest.reset();
                         byte[] byteArr = new byte[1020];
                         int fileNum = centralServer.getFileNum();
-                        FileOutputStream fileOutputStream = new FileOutputStream("/Users/payalkothari/Documents/DS/Chord_Project/Chord_DHT/src/edu/rit/CSCI652/impl/ServerFileStorage/" + fileName);
+                        FileOutputStream fileOutputStream = new FileOutputStream(centralServer.getFileStorageFolderPath() + fileName);
                         BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(fileOutputStream);
                         InputStream inputStream = socket.getInputStream();
                         int bytesRead = 0;
@@ -130,8 +130,9 @@ public class ThreadHandler extends Thread implements Serializable {
         outObject.writeUTF(fileName);
         outObject.flush();
         System.out.println("Sending file to node : " + contactNode.getGUID());
+        System.out.println(" Ip is : " + contactNode.getIp() + "  " + contactNode.getPort());
 
-        File file = new File("/Users/payalkothari/Documents/DS/Chord_Project/Chord_DHT/src/edu/rit/CSCI652/impl/ServerFileStorage/" + fileName);
+        File file = new File(centralServer.getFileStorageFolderPath() + fileName);
         BufferedInputStream bufferedInputStream = new BufferedInputStream(new FileInputStream(file));
 
         long fileLen = file.length();
@@ -174,7 +175,7 @@ public class ThreadHandler extends Thread implements Serializable {
         Iterator<Integer> iterator = GUIDList.iterator();
         while (iterator.hasNext()) {
             int nextID = iterator.next();
-            if (nextID > successor) {
+            if (nextID >= successor) {
                 successor = nextID;
                 break;
             }

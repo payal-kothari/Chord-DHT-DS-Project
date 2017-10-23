@@ -31,7 +31,12 @@ public class CentralServer {
     private static HashSet<Integer> busyPorts = new HashSet<>();
     private static List<Integer> GUIDList = new ArrayList<>();
     private static ConcurrentHashMap<Integer, Node>  globalTable = new ConcurrentHashMap<>();
+    //private static String fileStorageFolderPath = "/home/stu10/s16/pak4180/Distributed Systems/Chord/edu/rit/CSCI652/impl/ServerFileStorage";
+    private static String fileStorageFolderPath = "/Users/payalkothari/Documents/DS/Chord_Project/Chord_DHT/src/edu/rit/CSCI652/impl/ServerFileStorage";
 
+    public static String getFileStorageFolderPath() {
+        return fileStorageFolderPath;
+    }
 
     public static int getMaxFingerTableSize() {
         return maxFingerTableSize;
@@ -51,7 +56,7 @@ public class CentralServer {
 
     public static void main(String[] args) throws IOException, ClassNotFoundException {
         CentralServer threadSyncObject = new CentralServer();
-        File dir = new File("/Users/payalkothari/Documents/DS/Chord_Project/Chord_DHT/src/edu/rit/CSCI652/impl/ServerFileStorage");
+        File dir = new File(fileStorageFolderPath);
         dir.mkdirs();
 
 //        maxNodes = Integer.parseInt(args[0]);
