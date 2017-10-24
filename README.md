@@ -1,4 +1,3 @@
-
 # Chord DHT
 
 * Run Central Server using following commands:
@@ -9,5 +8,15 @@ java edu.rit.CSCI652.impl.CentralServer 32
 
 * Run node using following commands:
 java edu.rit.CSCI652.impl.ClientNode
+
+
+// Note : Consider only following files
+   1. CentralServer.java
+   2. ThreadHandler.java
+   3. ClientNode.java
+   4. Node.java
+   5. FingerTableEntry.java
+   6. incomingNotifHandler.java
+
 
 
