@@ -53,7 +53,7 @@ public class ThreadHandler extends Thread implements Serializable {
                         Node newNode = new Node(GUID, nodeIp, 8780);
                         globalTable.put(GUID, newNode);
                         Node predecessor = findPredecessor(GUID);
-                        Node successor = findSuccessor(GUID);
+                        Node successor = findSuccessor2(GUID);
                         ObjectOutputStream outObject = new ObjectOutputStream(socket.getOutputStream());
                         outObject.writeInt(centralServer.getMaxFingerTableSize());
                         outObject.writeInt(GUID);
@@ -65,7 +65,6 @@ public class ThreadHandler extends Thread implements Serializable {
                         }
                         outObject.flush();
                         update_others(newNode);
-                        System.out.println("");
                         outObject.close();
                         socket.close();
                         break;
@@ -92,7 +91,6 @@ public class ThreadHandler extends Thread implements Serializable {
                         inputStream.close();
                         fileOutputStream.close();
                         socket.close();
-                        System.out.println("File id : " + fileHashID);
                         HashMap map = centralServer.getFilesMap();
                         map.put(fileName, fileHashID);
                         Node contactNode;
@@ -106,7 +104,6 @@ public class ThreadHandler extends Thread implements Serializable {
                     case "Search" :
                         String fileNameToSearch = objectInStream.readUTF();
                         Node requestingNode =  (Node) objectInStream.readObject();
-                        System.out.println("searching " + fileNameToSearch);
                         Map fileHashMap = centralServer.getFilesMap();
                         int hashId = 0;
                         if(fileHashMap.get(fileNameToSearch) != null){
@@ -120,7 +117,6 @@ public class ThreadHandler extends Thread implements Serializable {
                             outObject2.flush();
                             outObject2.close();
                         }else {
-                            System.out.println("File is not available");
                             Socket socket = new Socket(requestingNode.getIp(), requestingNode.getPort());
                             ObjectOutputStream outObject2 = new ObjectOutputStream(socket.getOutputStream());
                             outObject2.writeUTF("PrintResult");
@@ -159,6 +155,26 @@ public class ThreadHandler extends Thread implements Serializable {
         }
     }
 
+    private Node findSuccessor2(int GUID) {
+        List<Integer> GUIDList = centralServer.getGUIDList();
+        Collections.sort(GUIDList);
+
+        int successor = GUID;
+        Iterator<Integer> iterator = GUIDList.iterator();
+        while (iterator.hasNext()) {
+            int nextID = iterator.next();
+            if (nextID > successor) {
+                successor = nextID;
+                break;
+            }
+        }
+        if (successor == GUID)
+            successor = Collections.min(GUIDList);   // to rotate around the chord circle
+
+        ConcurrentHashMap globalTable = centralServer.getGlobalTable();
+        return (Node) globalTable.get(successor);
+    }
+
     private void update_others2(Node nodeAboutToLeave, Node succNode, Node predNode) throws IOException {
 
         ConcurrentHashMap globalTable = centralServer.getGlobalTable();
@@ -190,8 +206,6 @@ public class ThreadHandler extends Thread implements Serializable {
         outObject.writeInt(fileHashID);
         outObject.writeUTF(fileName);
         outObject.flush();
-        System.out.println("Sending file to node : " + contactNode.getGUID());
-        System.out.println(" Ip is : " + contactNode.getIp() + "  " + contactNode.getPort());
 
         File file = new File(centralServer.getFileStorageFolderPath() + fileName);
         BufferedInputStream bufferedInputStream = new BufferedInputStream(new FileInputStream(file));
@@ -290,8 +304,4 @@ public class ThreadHandler extends Thread implements Serializable {
 
         return GUID;
     }
-
-
-
-
 }

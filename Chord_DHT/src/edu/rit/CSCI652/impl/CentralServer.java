@@ -90,7 +90,6 @@ public class CentralServer {
             ObjectInputStream objectInStream = new ObjectInputStream(subSocket.getInputStream());
             String command = objectInStream.readUTF();
             new ThreadHandler(subSocket, nextFreePort, threadSyncObject, command, objectInStream).start();  // new thread for new connection
-            System.out.println();
         }
     }
 

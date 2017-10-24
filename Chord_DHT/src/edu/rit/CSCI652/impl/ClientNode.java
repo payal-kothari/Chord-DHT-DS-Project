@@ -116,11 +116,9 @@ public class ClientNode
             switch (option){
 
                 case 1 :
-                    System.out.println("Joining the network");
                     Socket socket = new Socket(centralServerIp, 2000);
                     ObjectInputStream objectInStream = new ObjectInputStream(socket.getInputStream());
                     int reconnectPort = objectInStream.readInt();
-                    System.out.println("received sec port");
                     Socket reconnectSocket = new Socket(centralServerIp, reconnectPort);
                     ObjectOutputStream outObject = new ObjectOutputStream(reconnectSocket.getOutputStream());
                     outObject.writeUTF("Join");
@@ -153,8 +151,6 @@ public class ClientNode
                     break;
                 case 2 :
                     System.out.println("*******************  Finger Table  ******************** \n");
-                    System.out.println("Predecessor  : " + predecessor.getGUID());
-                    System.out.println("Successor  : " + successor.getGUID());
                     System.out.print(" Start ");
                     System.out.print("\t\t  Interval ");
                     System.out.print("\t\t\t\t   Successor \n");
@@ -244,7 +240,7 @@ public class ClientNode
                                 outObjectSucc.writeInt(hashID);
                                 outObjectSucc.writeUTF(f.getName());
                                 outObjectSucc.flush();
-                                outObjectSucc.close();
+                               // outObjectSucc.close();
                                 BufferedInputStream bufferedInputStreamSucc = new BufferedInputStream(new FileInputStream(f));
                                 long fLen = f.length();
                                 byte [] byteArr6  = new byte [(int)fLen];
@@ -270,6 +266,7 @@ public class ClientNode
                     outObject6.writeObject(successor);
                     outObject6.writeObject(predecessor);
                     outObject6.flush();
+                    System.exit(0);
                     break;
             }
 

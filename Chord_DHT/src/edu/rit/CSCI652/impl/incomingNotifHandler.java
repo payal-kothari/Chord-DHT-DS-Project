@@ -20,7 +20,6 @@ public class incomingNotifHandler extends Thread{
                 ObjectInputStream objectInStream = new ObjectInputStream(socket.getInputStream());
                 String in = objectInStream.readUTF();
 
-            System.out.println("accepted a connection for : " + in);
                 switch (in){
                     case "New Node" :
                         System.out.println("******  New node has joined the network, updating the values......");
@@ -33,7 +32,6 @@ public class incomingNotifHandler extends Thread{
 //                        check_files();
                         break;
                     case "Store File" :
-                        System.out.println("Receiving a file from server");
                         int fileHashId = objectInStream.readInt();
                         String fileName = objectInStream.readUTF();
                         List filesList =  ClientNode.getFileHashIDAndNameMap().get(fileHashId);
