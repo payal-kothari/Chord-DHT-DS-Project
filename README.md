@@ -2,13 +2,13 @@
 
 attach docker containers from - payalContainer0 - payalContainer16
 
-In payalContainer0   // ip of this container must be 172.17.0.4
-cd Payal/
-java CentralServer 
+In payalContainer0   // ip of this container must be 172.17.0.4                                 
+cd Payal/                                       
+java CentralServer                          
 
-In payalContainer1-16   
-cd Payal/
-java ClientNode
+In payalContainer1-16                                   
+cd Payal/                               
+java ClientNode                             
 
 
 // 32 can be replaced with any other such as 16, 64 etc.                            
