@@ -1,14 +1,18 @@
 # Chord DHT
 
-* Run Central Server using following commands:
-java edu.rit.CSCI652.impl.CentralServer 32
+attach docker containers from - payalContainer0 - payalContainer16
+
+In payalContainer0   // ip of this container must be 172.17.0.4
+cd Payal/
+java CentralServer 
+
+In payalContainer1-16   
+cd Payal/
+java ClientNode
+
 
 // 32 can be replaced with any other such as 16, 64 etc.                            
 // This number represents total number of nodes in a Chord network
-
-* Run node using following commands:
-java edu.rit.CSCI652.impl.ClientNode
-
 
 // Note : Consider only following files
    1. CentralServer.java
