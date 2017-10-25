@@ -23,4 +23,15 @@ java ClientNode
    6. incomingNotifHandler.java
 
 
+// For any problem, refresh all the docker container using following steps:                     
+ssh pak4180@glados.cs.rit.edu                           
+cd Distributed\ Systems/                                
+chmod 777 script.sh                             
+./script.sh                                     
+
+
+
+
+
+
 
