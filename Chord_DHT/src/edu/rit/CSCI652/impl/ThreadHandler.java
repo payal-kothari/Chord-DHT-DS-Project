@@ -80,12 +80,12 @@ public class ThreadHandler extends Thread implements Serializable {
                         int bytesRead = 0;
                         while( (bytesRead=inputStream.read(byteArr))!=-1){
                             bufferedOutputStream.write(byteArr, 0, bytesRead);
-                            messageDigest.update(byteArr);
+                            messageDigest.update(byteArr);                  // SHA-1 of content of the file
                         }
                         bufferedOutputStream.flush();
                         byte[] resultByteArray =  messageDigest.digest();
                         BigInteger bigNum = new BigInteger(1, resultByteArray);
-                        int fileHashID = Math.abs(bigNum.intValue()) % centralServer.getMaxNodes();
+                        int fileHashID = Math.abs(bigNum.intValue()) % centralServer.getMaxNodes(); 
                         bufferedOutputStream.close();
                         objectInStream.close();
                         inputStream.close();
