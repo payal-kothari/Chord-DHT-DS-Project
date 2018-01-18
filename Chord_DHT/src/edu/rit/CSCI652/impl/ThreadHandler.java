@@ -85,7 +85,7 @@ public class ThreadHandler extends Thread implements Serializable {
                         bufferedOutputStream.flush();
                         byte[] resultByteArray =  messageDigest.digest();
                         BigInteger bigNum = new BigInteger(1, resultByteArray);
-                        int fileHashID = Math.abs(bigNum.intValue()) % centralServer.getMaxNodes(); 
+                        int fileHashID = Math.abs(bigNum.intValue()) % centralServer.getMaxNodes(); // converting Hash of file content to a number in the Chord nodes circular space
                         bufferedOutputStream.close();
                         objectInStream.close();
                         inputStream.close();
